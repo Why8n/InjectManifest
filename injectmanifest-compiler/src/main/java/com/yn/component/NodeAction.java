@@ -1,17 +1,18 @@
 package com.yn.component;
 
 import com.yn.component.bean.Attribute;
-import com.yn.structure.RidLastSet;
+import com.yn.structure.KVSameList;
+import com.yn.utils.Utils;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by Whyn on 2017/8/31.
  */
 
 public class NodeAction {
-    private Set<Attribute> actions = new RidLastSet<>();
+    private List<Attribute> actions = new KVSameList<>();
 
     public void addAction(String key, String value) {
         actions.add(new Attribute(key, value));
@@ -23,13 +24,15 @@ public class NodeAction {
         }
     }
 
-    public void addAction(Attribute attr) {
-        actions.add(attr);
+    public void addAction(Attribute newAttr) {
+        actions.add(newAttr);
     }
-    public boolean isEmpty(){
+
+    public boolean isEmpty() {
         return actions.isEmpty();
     }
-    public Set<Attribute> all(){
+
+    public List<Attribute> all() {
         return actions;
     }
 }

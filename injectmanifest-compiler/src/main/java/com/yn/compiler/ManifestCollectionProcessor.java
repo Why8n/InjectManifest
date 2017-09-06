@@ -3,6 +3,7 @@ package com.yn.compiler;
 import com.google.auto.service.AutoService;
 import com.yn.annotations.InjectActivity;
 import com.yn.annotations.InjectApp;
+import com.yn.annotations.InjectData;
 import com.yn.annotations.InjectIntentFilter;
 import com.yn.annotations.InjectManifest;
 import com.yn.annotations.InjectPermissions;
@@ -15,6 +16,7 @@ import com.yn.component.NodeApp;
 import com.yn.component.NodeManifest;
 import com.yn.component.NodeReceiver;
 import com.yn.component.NodeService;
+import com.yn.component.bean.DataAttribute;
 import com.yn.utils.Utils;
 import com.yn.xmls.factory.XmlFactory;
 import com.yn.xmls.interfaces.IXml;
@@ -189,10 +191,19 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
 
     private void parseService(AndroidManifest.ServiceCollection serviceCollection, InjectService service, Element element) {
         String serviceName = Utils.getProperName(mElementUtils.getPackageOf(element).toString(), service.name());
-        NodeService nodeService = (NodeService) new NodeService(serviceName)
-                .addAttr(AndroidManifest.ServiceCollection.KEY_ATTR_NAME, serviceName)
-                .addAttr(AndroidManifest.ServiceCollection.KEY_ATTR_LABEL, service.label());
-        serviceCollection.collect(nodeService);
+        serviceCollection.collect(
+                new NodeService(serviceName)
+                        .name(serviceName)
+                        .description(service.description())
+                        .directBootAware(service.directBootAware().getResult())
+                        .enabled(service.enabled().getResult())
+                        .exported(service.exported().getResult())
+                        .icon(service.icon())
+                        .isolatedProcess(service.isolatedProcess().getResult())
+                        .label(service.label())
+                        .permission(service.permission())
+                        .process(service.process())
+        );
     }
 
     private boolean parseActivity(RoundEnvironment roundEnvironment, Collections manifest) {
@@ -248,13 +259,28 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 .theme(activity.theme())
                 .uiOptions(activity.uiOptions())
                 .windowSoftInputMode(activity.windowSoftInputMode());
-        InjectIntentFilter intentFilter = activity.getClass().getAnnotation(InjectIntentFilter.class);
-        if (intentFilter != null) {
-            String[] actions = intentFilter.action();
-            nodeActivity.addCategory(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, intentFilter.category());
-            for (int i = 0, length = actions.length; i < length; ++i) {
-                nodeActivity.addAction(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, actions[i]);
-            }
+        InjectIntentFilter intentFilter = activity.intentFilter();
+        String[] actions = intentFilter.action();
+        for (int i = 0, length = actions.length; i < length; ++i) {
+            nodeActivity.addAction(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, actions[i]);
+        }
+        String[] categories = intentFilter.category();
+        for (int i = 0, length = categories.length; i < length; ++i) {
+            nodeActivity.addCategory(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, categories[i]);
+        }
+        InjectData[] datas = intentFilter.data();
+        for (int i = 0, length = datas.length; i < length; ++i) {
+
+            nodeActivity.addData(
+                    new DataAttribute()
+                            .scheme(datas[i].scheme())
+                            .host(datas[i].host())
+                            .port(datas[i].port())
+                            .path(datas[i].path())
+                            .pathPattern(datas[i].pathPattern())
+                            .pathPrefix(datas[i].pathPrefix())
+                            .mimeType(datas[i].mimeType())
+            );
         }
         collections.collect(nodeActivity);
     }

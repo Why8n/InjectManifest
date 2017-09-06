@@ -1,95 +1,75 @@
 package com.yn.component;
 
+import com.yn.utils.Utils;
+
 /**
  * Created by Whyn on 2017/9/5.
  */
 
 public class NodeService extends ComponentBasic {
-//    String name;
-//    Attrs attrs = new Attrs();
-//    NodeIntentFilter intentFilter = new NodeIntentFilter();
-
     public NodeService(String name) {
         super(name);
     }
 
-    @Override
-    public <T extends ComponentBasic> void copy(T other) {
-        if (other == null)
-            return;
-        super.copy(other);
-        NodeService service = (NodeService) other;
-        //TODO::add service spec filed
+    //    android:description="string resource"
+    public NodeService description(String res) {
+        attrs.addAttr("android:description", res);
+        return this;
     }
-//
-//    public NodeService addAttr(String key, String value) {
-//        if (value == null || value.isEmpty())
-//            return this;
-//        attrs.addAttr(key, value);
-//        return this;
-//    }
-//
-//    public NodeService addAction(String key, String value) {
-//        intentFilter.addAction(key, value);
-//        return this;
-//    }
-//
-//    public NodeService addAction(Set<Attribute> actions) {
-//        for (Attribute action : actions) {
-//            intentFilter.addAction(action.key, action.value);
-//        }
-//        return this;
-//    }
-//
-//    public NodeService addCategory(String key, String value) {
-//        intentFilter.addCategory(key, value);
-//        return this;
-//    }
-//    public NodeService addCategory(Set<Attribute> categories) {
-//        for (Attribute actegory : categories) {
-//            intentFilter.addCategory(actegory.key, actegory.value);
-//        }
-//        return this;
-//    }
-//
-//    public void copy(NodeService other) {
-//        if (other == null)
-//            return;
-//        this.name = other.name;
-//        this.attrs.addAllAttr(other.attrs.all());
-//        this.intentFilter.copy(other.intentFilter);
-//    }
-//
-//    public NodeService addAllAttr(Set<Attribute> attributes) {
-//        attrs.addAllAttr(attributes);
-//        return this;
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        int result = 17;
-//        result *= 31 + name.hashCode();
-////        result *= 31 + label.hashCode();
-//        return result;
-//    }
-//
-//    @Override
-//    public boolean equals(Object o) {
-//        boolean bRet = false;
-//        do {
-//            if (bRet = (this == o))
-//                break;
-//            if (bRet = !(o instanceof NodeActivity))
-//                break;
-//            NodeActivity other = (NodeActivity) o;
-//            if (this.name.startsWith(".")) {
-//                if (bRet = other.name.contains(this.name)) {
-//                    this.name = other.name;
-//                }
-//                break;
-//            }
-//            bRet = this.name.equals(other.name);
-//        } while (false);
-//        return bRet;
-//    }
+
+    //    android:directBootAware=["true" | "false"]
+    public NodeService directBootAware(String bRet) {
+        attrs.addAttr("android:directBootAware", bRet);
+        return this;
+    }
+
+    //    android:enabled=["true" | "false"]
+    public NodeService enabled(String bRet) {
+        attrs.addAttr("android:enabled", bRet);
+        return this;
+    }
+
+    //    android:exported=["true" | "false"]
+    public NodeService exported(String bRet) {
+        attrs.addAttr("android:exported", bRet);
+        return this;
+    }
+
+    //    android:icon="drawable resource"
+    public NodeService icon(String res) {
+        attrs.addAttr("android:icon", res);
+        return this;
+    }
+
+    //    android:isolatedProcess=["true" | "false"]
+    public NodeService isolatedProcess(String bRet) {
+        attrs.addAttr("android:isolatedProcess", bRet);
+        return this;
+    }
+
+    //    android:label="string resource"
+    public NodeService label(String label) {
+        attrs.addAttr("android:label", label);
+        return this;
+    }
+
+    //    android:name="string"
+    public NodeService name(String name) {
+        Utils.checkNotNull(name, "service name must not be null");
+        attrs.addAttr("android:name", name);
+        return this;
+    }
+
+    //    android:permission="string"
+    public NodeService permission(String permission) {
+        attrs.addAttr("android:permission", permission);
+        return this;
+    }
+
+    //    android:process="string"
+    public NodeService process(String process) {
+        attrs.addAttr("android:process", process);
+        return this;
+    }
+
 }

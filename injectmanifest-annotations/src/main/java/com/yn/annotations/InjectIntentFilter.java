@@ -16,6 +16,8 @@ import java.lang.annotation.Target;
 public @interface InjectIntentFilter {
     String[] action() default {};
 
-    String category() default "";
+    String[] category() default "";
+
+    InjectData[] data() default @InjectData;
 
 }

@@ -2,20 +2,21 @@ package com.yn.component;
 
 
 import com.yn.component.bean.Attribute;
-import com.yn.structure.RidLastSet;
+import com.yn.structure.KVSameList;
+import com.yn.utils.Utils;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by Whyn on 2017/8/31.
  */
 
 public class NodeCategory {
-    private Set<Attribute> attrs = new RidLastSet<>();
+    private List<Attribute> categories = new KVSameList<>();
 
     public void addAttr(String key, String value) {
-        attrs.add(new Attribute(key, value));
+        categories.add(new Attribute(key, value));
     }
 
     public void addAttr(Map<String, String> attr) {
@@ -24,15 +25,15 @@ public class NodeCategory {
         }
     }
 
-    public void addAttr(Attribute attr) {
-        attrs.add(attr);
+    public void addAttr(Attribute newAttr) {
+        categories.add(newAttr);
     }
 
     public boolean isEmpty() {
-        return attrs.isEmpty();
+        return categories.isEmpty();
     }
 
-    public Set<Attribute> all() {
-        return attrs;
+    public List<Attribute> all() {
+        return categories;
     }
 }

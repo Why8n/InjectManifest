@@ -5,6 +5,7 @@ package com.yn.component;
  */
 
 import com.yn.component.bean.Attribute;
+import com.yn.component.bean.DataAttribute;
 
 import java.util.Set;
 
@@ -54,6 +55,11 @@ public class ComponentBasic extends NodeBasic {
         for (Attribute category : categories) {
             intentFilter.addCategory(category.key, category.value);
         }
+        return this;
+    }
+
+    public ComponentBasic addData(DataAttribute data) {
+        intentFilter.addData(data);
         return this;
     }
 
