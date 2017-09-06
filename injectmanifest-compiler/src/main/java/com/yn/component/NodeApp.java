@@ -13,12 +13,12 @@ public class NodeApp {
     final Attrs attrs = new Attrs();
 
     public NodeApp setName(String name) {
-        attrs.addAttr(ConstValue.KEY_ATTR_NAME, name);
+        attrs.addAttr(AndroidManifest.ApplicationCollection.KEY_ATTR_NAME, name);
         return this;
     }
 
     public NodeApp setLabel(String label) {
-        attrs.addAttr(ConstValue.KEY_ATTR_NAME, label);
+        attrs.addAttr(AndroidManifest.ApplicationCollection.KEY_ATTR_NAME, label);
         return this;
     }
 

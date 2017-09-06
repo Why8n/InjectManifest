@@ -1,7 +1,7 @@
 package com.yn.utils;
 
+import com.yn.component.AndroidManifest;
 import com.yn.component.bean.Attribute;
-import com.yn.define.ConstValue;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -46,6 +46,23 @@ public final class Utils {
 
     public static void warn(String format, Object... args) {
         warn(String.format(format, args));
+    }
+
+    public static void error(String msg) {
+        checkMessager();
+        sMessager.printMessage(Diagnostic.Kind.ERROR, msg);
+    }
+
+    public static void error(String format, Object... args) {
+        error(String.format(format, args));
+    }
+    public static void error(Element element,String msg) {
+        checkMessager();
+        sMessager.printMessage(Diagnostic.Kind.ERROR, msg,element);
+    }
+
+    public static void error(Element element,String format, Object... args) {
+        error(element,String.format(format, args));
     }
 
     private static void checkMessager() {
@@ -134,7 +151,7 @@ public final class Utils {
     public static String getProperName(final String pkName, final String annotatedName) {
         if (pkName == null || annotatedName == null)
             return annotatedName;
-        return !annotatedName.startsWith(ConstValue.DOT) ? annotatedName : pkName + annotatedName;
+        return !annotatedName.startsWith(AndroidManifest.DOT) ? annotatedName : pkName + annotatedName;
     }
 
     public static <V extends Attribute> String getValueFromCollection(final String key, Collection<? extends V> collection) {

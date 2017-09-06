@@ -1,7 +1,6 @@
 package com.yn.component;
 
 import com.yn.component.bean.Attribute;
-import com.yn.define.ConstValue;
 import com.yn.utils.Utils;
 import com.yn.xmls.interfaces.INode;
 
@@ -21,6 +20,13 @@ public abstract class AndroidManifest<T> {
     private static final String QUALIFIED_NAME_INTENTFILTER = "intent-filter";
     private static final String QUALIFIED_NAME_ACTION = "action";
     private static final String QUALIFIED_NAME_CATEGORY = "category";
+
+
+    public static final String DOT = ".";
+
+    public static final String KEY_ATTR_NAME = "android:name";
+    public static final String KEY_ATTR_LABEL = "android:label";
+
 
     private static final int ACTION_NONE = 0x00;
     private static final int ACTION_ACTIVITY = 0x01;
@@ -42,10 +48,10 @@ public abstract class AndroidManifest<T> {
         return mQualifiedName;
     }
 
-    public boolean collect(T item) {
+    public void collect(T item) {
         if (mCollections.contains(item))
             mCollections.remove(item);
-        return mCollections.add(item);
+        mCollections.add(item);
     }
 
 
@@ -66,24 +72,33 @@ public abstract class AndroidManifest<T> {
 
     public abstract String setQName();
 
+    public static class ManifestCollection extends AndroidManifest<NodeManifest> {
+        public static final String KEY_PACKAGE = "package";
+        public static final String KEY_SHARED_USER_ID = "android:sharedUserId";
+        public static final String KEY_SHARED_USER_LABEL = "android:sharedUserLabel";
+        public static final String KEY_VERSION_CODE = "android:versionCode";
+        public static final String KEY_VERSION_NAME = "android:versionName";
+        public static final String KEY_INSTALL_LOCATION = "android:installLocation";
 
-    public static class ManifestCollection extends AndroidManifest<Attribute> {
+        NodeManifest mManifest = new NodeManifest();
+
+        {
+            mCollections.add(mManifest);
+        }
 
         @Override
         public void write2File(INode nodeWriter) {
             try {
 //                nodeWriter.startDocument();
-                nodeWriter.startTag(mQualifiedName, mCollections);
+                nodeWriter.startTag(mQualifiedName, mManifest.attrs.all());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
         @Override
-        public boolean collect(Attribute item) {
-            if ("package".equals(item.key))
-                sPackageName = item.value;
-            return mCollections.add(item);
+        public void collect(NodeManifest item) {
+            mManifest.copy(item);
         }
 
         @Override
@@ -91,8 +106,12 @@ public abstract class AndroidManifest<T> {
             if (!qName.equals(mQualifiedName))
                 return;
             if (attributes != null && !attributes.isEmpty()) {
-                for (Attribute attr : attributes)
-                    collect(attr);
+                for (Attribute attr : attributes) {
+                    if (KEY_PACKAGE.equals(attr.key)) {
+                        sPackageName = attr.value;
+                    }
+                    mManifest.attrs.addAttr(attr);
+                }
             }
         }
 
@@ -119,9 +138,8 @@ public abstract class AndroidManifest<T> {
         }
 
         @Override
-        public boolean collect(NodeApp newItem) {
+        public void collect(NodeApp newItem) {
             mApp.copy(newItem);
-            return true;
         }
 
 
@@ -145,7 +163,7 @@ public abstract class AndroidManifest<T> {
         public void write2File(INode nodeWriter) {
             try {
                 for (String permission : mCollections) {
-                    nodeWriter.startTag(mQualifiedName, new Attribute(ConstValue.KEY_ATTR_NAME, permission));
+                    nodeWriter.startTag(mQualifiedName, new Attribute(KEY_ATTR_NAME, permission));
                     nodeWriter.endTag(mQualifiedName);
                 }
             } catch (Exception e) {
@@ -175,12 +193,12 @@ public abstract class AndroidManifest<T> {
         protected boolean isLastElement = false;
 
         @Override
-        public boolean collect(T item) {
+        public void collect(T item) {
             if (mCollections.contains(item)) {
                 update(item);
-                return true;
+                return;
             }
-            return mCollections.add(item);
+            mCollections.add(item);
         }
 
         private void update(final T item) {
@@ -271,7 +289,7 @@ public abstract class AndroidManifest<T> {
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_ACTIVITY;
-                String activityName = getNameFromSet(ConstValue.KEY_ATTR_NAME, attributes);
+                String activityName = getNameFromSet(KEY_ATTR_NAME, attributes);
                 activityName = Utils.getProperName(sPackageName, activityName);
                 if (attributes != null && !attributes.isEmpty()) {
                     collect((NodeActivity) new NodeActivity(lastComponentName = activityName).addAttr(attributes));
@@ -372,7 +390,7 @@ public abstract class AndroidManifest<T> {
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_SERVICE;
-                String serviceName = getNameFromSet(ConstValue.KEY_ATTR_NAME, attributes);
+                String serviceName = getNameFromSet(KEY_ATTR_NAME, attributes);
                 serviceName = Utils.getProperName(sPackageName, serviceName);
                 if (attributes != null && !attributes.isEmpty()) {
                     collect((NodeService) new NodeService(lastComponentName = serviceName).addAttr(attributes));
@@ -447,7 +465,7 @@ public abstract class AndroidManifest<T> {
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_RECEIVER;
-                String receiverName = getNameFromSet(ConstValue.KEY_ATTR_NAME, attributes);
+                String receiverName = getNameFromSet(KEY_ATTR_NAME, attributes);
                 receiverName = Utils.getProperName(sPackageName, receiverName);
                 if (attributes != null && !attributes.isEmpty()) {
                     collect((NodeReceiver) new NodeReceiver(lastComponentName = receiverName).addAttr(attributes));

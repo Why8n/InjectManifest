@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 import com.yn.annotations.InjectActivity;
 import com.yn.annotations.InjectApp;
 import com.yn.annotations.InjectIntentFilter;
+import com.yn.annotations.InjectManifest;
 import com.yn.annotations.InjectPermissions;
 import com.yn.annotations.InjectReceiver;
 import com.yn.annotations.InjectService;
@@ -11,15 +12,16 @@ import com.yn.component.AndroidManifest;
 import com.yn.component.Collections;
 import com.yn.component.NodeActivity;
 import com.yn.component.NodeApp;
+import com.yn.component.NodeManifest;
 import com.yn.component.NodeReceiver;
 import com.yn.component.NodeService;
-import com.yn.define.ConstValue;
 import com.yn.utils.Utils;
 import com.yn.xmls.factory.XmlFactory;
 import com.yn.xmls.interfaces.IXml;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +31,7 @@ import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.StandardLocation;
@@ -94,11 +97,17 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
             xmlDecoder = parseXml(androidManifest, androidManifestPath);
         }
 
-        parseApp(roundEnvironment, androidManifest);
+        if (!parseManifest(roundEnvironment, androidManifest))
+            return false;
+        if (!parseApp(roundEnvironment, androidManifest))
+            return false;
+        if (!parseActivity(roundEnvironment, androidManifest))
+            return false;
+        if (!parseService(roundEnvironment, androidManifest))
+            return false;
+        if (!parseReceiver(roundEnvironment, androidManifest))
+            return false;
         parsePermission(roundEnvironment, androidManifest);
-        parseActivity(roundEnvironment, androidManifest);
-        parseService(roundEnvironment, androidManifest);
-        parseReceiver(roundEnvironment, androidManifest);
 
         return isNeedGenerateXml ? generatedXml(xmlDecoder) : false;
 
@@ -115,85 +124,89 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         return manifest;
     }
 
-    private IXml parseXml(Collections androidManifest, String androidManifestPath) {
-        IXml xmlDecoder = XmlFactory.createXmlDecoder(androidManifest);
-        xmlDecoder.parseXml(androidManifestPath);
-        return xmlDecoder;
-    }
-
-
-    private boolean generatedXml(IXml xmlDecoder) {
-        boolean bRet = true;
-        Writer writer = null;
-        try {
-            writer = processingEnv.getFiler().createResource(
-                    StandardLocation.SOURCE_OUTPUT, "", ANDROID_MANIFEST_XML).openWriter();
-            xmlDecoder.createXml(writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-            bRet = false;
-        } finally {
-            if (writer != null) {
-                Utils.close(writer);
-            }
+    private boolean parseManifest(RoundEnvironment roundEnvironment, Collections manifest) {
+        Set<? extends Element> annotatedElements = roundEnvironment.getElementsAnnotatedWith(InjectManifest.class);
+        if (!checkIsSingle(annotatedElements, InjectManifest.class))
+            return false;
+        AndroidManifest.ManifestCollection manifestCollection = (AndroidManifest.ManifestCollection) manifest.getTag(TAG_MANIFEST);
+        for (Element element : annotatedElements) {
+            if (!isClass(element, InjectManifest.class))
+                return false;
+            isNeedGenerateXml = true;
+            InjectManifest injectManifest = element.getAnnotation(InjectManifest.class);
+            parseManifest(manifestCollection, injectManifest);
         }
-        Utils.note("generate AndroidManifest.xml %s", bRet ? "successfully" : "failed");
-        return bRet;
+        return true;
     }
 
-    private void parseReceiver(RoundEnvironment roundEnvironment, Collections manifest) {
+    private void parseManifest(AndroidManifest.ManifestCollection manifestCollection, InjectManifest manifest) {
+        manifestCollection.collect(
+                new NodeManifest()
+                        .setPackage(manifest.pkName())
+                        .setSharedUserId(manifest.sharedUserId())
+                        .setSharedUserLabel(manifest.sharedUserLabel())
+                        .setVersionCode(manifest.versionCode())
+                        .setVersionName(manifest.versionName())
+                        .setInstallLocation(manifest.installLocation().getName())
+        );
+    }
+
+
+    private boolean parseReceiver(RoundEnvironment roundEnvironment, Collections manifest) {
         AndroidManifest.ReceiverCollection receiverCollection =
                 (AndroidManifest.ReceiverCollection) manifest.getTag(TAG_RECEIVER);
         for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectReceiver.class)) {
-            if (!isSubtypeOfType(element, TYPE_RECEIVER))
-                continue;
+            if (!isClass(element, InjectReceiver.class) || !isSubtypeOfType(element, TYPE_RECEIVER))
+                return false;
             isNeedGenerateXml = true;
             InjectReceiver receiver = element.getAnnotation(InjectReceiver.class);
             parseReceiver(receiverCollection, receiver, element);
-
         }
+        return true;
     }
 
     private void parseReceiver(AndroidManifest.ReceiverCollection receiverCollection, InjectReceiver receiver, Element element) {
         String receiverName = Utils.getProperName(mElementUtils.getPackageOf(element).getQualifiedName().toString(),
                 receiver.name());
         receiverCollection.collect((NodeReceiver) new NodeReceiver(receiverName)
-                .addAttr(ConstValue.KEY_ATTR_NAME, receiverName)
-                .addAttr(ConstValue.KEY_ATTR_LABEL, receiver.label())
+                .addAttr(AndroidManifest.ReceiverCollection.KEY_ATTR_NAME, receiverName)
+                .addAttr(AndroidManifest.ReceiverCollection.KEY_ATTR_LABEL, receiver.label())
         );
     }
 
-    private void parseService(RoundEnvironment roundEnvironment, Collections manifest) {
+    private boolean parseService(RoundEnvironment roundEnvironment, Collections manifest) {
         AndroidManifest.ServiceCollection serviceCollection =
                 (AndroidManifest.ServiceCollection) manifest.getTag(TAG_SERVICE);
         for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectService.class)) {
-            if (!isSubtypeOfType(element, TYPE_SERVICE))
-                continue;
+            if (!isClass(element, InjectService.class) || !isSubtypeOfType(element, TYPE_SERVICE))
+                return false;
             isNeedGenerateXml = true;
             InjectService service = element.getAnnotation(InjectService.class);
             parseService(serviceCollection, service, element);
         }
+        return true;
     }
 
     private void parseService(AndroidManifest.ServiceCollection serviceCollection, InjectService service, Element element) {
         String serviceName = Utils.getProperName(mElementUtils.getPackageOf(element).toString(), service.name());
         NodeService nodeService = (NodeService) new NodeService(serviceName)
-                .addAttr(ConstValue.KEY_ATTR_NAME, serviceName)
-                .addAttr(ConstValue.KEY_ATTR_LABEL, service.label());
+                .addAttr(AndroidManifest.ServiceCollection.KEY_ATTR_NAME, serviceName)
+                .addAttr(AndroidManifest.ServiceCollection.KEY_ATTR_LABEL, service.label());
         serviceCollection.collect(nodeService);
     }
 
-    private void parseActivity(RoundEnvironment roundEnvironment, Collections manifest) {
+    private boolean parseActivity(RoundEnvironment roundEnvironment, Collections manifest) {
         AndroidManifest.ActivityCollection activityCollection =
                 (AndroidManifest.ActivityCollection) manifest.getTag(TAG_ACTIVITY);
         checkCollection(activityCollection, AndroidManifest.ActivityCollection.class, TAG_ACTIVITY);
         for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectActivity.class)) {
-            if (!isSubtypeOfType(element, TYPE_ACTIVITY))
-                continue;
+            if (!isClass(element, InjectActivity.class) || !isSubtypeOfType(element, TYPE_ACTIVITY))
+                return false;
             InjectActivity activity = element.getAnnotation(InjectActivity.class);
             parseActivity(activityCollection, activity, element);
             isNeedGenerateXml = true;
         }
+        return true;
     }
 
 
@@ -203,32 +216,51 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         String activityName = Utils.getProperName(
                 mElementUtils.getPackageOf(element).getQualifiedName().toString(), activity.name());
         NodeActivity nodeActivity = (NodeActivity) (new NodeActivity(activityName)
-                .addAttr(ConstValue.KEY_ATTR_NAME, activityName))
-                .addAttr(ConstValue.KEY_ATTR_LABEL, activity.label());
+                .addAttr(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, activityName))
+                .addAttr(AndroidManifest.ActivityCollection.KEY_ATTR_LABEL, activity.label());
         InjectIntentFilter intentFilter = activity.getClass().getAnnotation(InjectIntentFilter.class);
         if (intentFilter != null) {
             String[] actions = intentFilter.action();
-            nodeActivity.addCategory(ConstValue.KEY_ATTR_NAME, intentFilter.category());
+            nodeActivity.addCategory(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, intentFilter.category());
             for (int i = 0, length = actions.length; i < length; ++i) {
-                nodeActivity.addAction(ConstValue.KEY_ATTR_NAME, actions[i]);
+                nodeActivity.addAction(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, actions[i]);
             }
         }
         collections.collect(nodeActivity);
     }
 
-    private void parseApp(RoundEnvironment roundEnvironment, Collections manifest) {
+    private boolean checkIsSingle(Set<? extends Element> annotationElements, Class<? extends Annotation> annotation) {
+        if (annotationElements.size() > 1) {
+            Utils.error("@%s must be annotated in just one Application class", annotation.getSimpleName());
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isClass(Element element, Class<? extends Annotation> annotationCls) {
+        if (element.getKind() != ElementKind.CLASS) {
+            Utils.error(element, "@%s must be annotated in class", annotationCls.getSimpleName());
+            return false;
+        }
+        return true;
+    }
+
+    private boolean parseApp(RoundEnvironment roundEnvironment, Collections manifest) {
+        Set<? extends Element> annotationElements = roundEnvironment.getElementsAnnotatedWith(InjectApp.class);
+        if (!checkIsSingle(annotationElements, InjectApp.class))
+            return false;
         AndroidManifest.ApplicationCollection appCollection =
                 (AndroidManifest.ApplicationCollection) manifest.getTag(TAG_APPLICATION);
-        for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectApp.class)) {
-            if (!isSubtypeOfType(element, TYPE_APP))
-                continue;
+        for (Element element : annotationElements) {
+            if (!isClass(element, InjectApp.class) || !isSubtypeOfType(element, TYPE_APP))
+                return false;
             InjectApp app = element.getAnnotation(InjectApp.class);
             parseApp(appCollection, app, element);
         }
+        return true;
     }
 
     private void parseApp(AndroidManifest.ApplicationCollection appCollection, InjectApp app, Element element) {
-
         String appName = Utils.getProperName(mElementUtils.getPackageOf(element).toString(), app.name());
         appCollection.collect(
                 new NodeApp()
@@ -270,5 +302,32 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
             Utils.warn("%s must extend from $s", element.getSimpleName(), desireType);
         }
         return isSubType;
+    }
+
+
+    private IXml parseXml(Collections androidManifest, String androidManifestPath) {
+        IXml xmlDecoder = XmlFactory.createXmlDecoder(androidManifest);
+        xmlDecoder.parseXml(androidManifestPath);
+        return xmlDecoder;
+    }
+
+
+    private boolean generatedXml(IXml xmlDecoder) {
+        boolean bRet = true;
+        Writer writer = null;
+        try {
+            writer = processingEnv.getFiler().createResource(
+                    StandardLocation.SOURCE_OUTPUT, "", ANDROID_MANIFEST_XML).openWriter();
+            xmlDecoder.createXml(writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+            bRet = false;
+        } finally {
+            if (writer != null) {
+                Utils.close(writer);
+            }
+        }
+        Utils.note("generate AndroidManifest.xml %s", bRet ? "successfully" : "failed");
+        return bRet;
     }
 }
