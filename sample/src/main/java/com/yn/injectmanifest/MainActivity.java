@@ -18,7 +18,7 @@ import java.util.List;
         Manifest.permission.WRITE_EXTERNAL_STORAGE
 })
 @InjectActivity(
-        name = "com.yn.injectmanifest.MainActivity",
+        name= "com.yn.injectmanifest.MainActivity",
         intentFilter = @InjectIntentFilter(
                 action = {"android.intent.action.MAIN", "android.intent.action_whyn_test"},
                 category = "android.intent.category.LAUNCHER"
@@ -41,17 +41,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public <T extends Dad> void test(T item){
+    public <T extends Dad> void test(T item) {
         List<T> list = new ArrayList<>();
 //        list.add(new Son());
         list.add(item);
     }
 
 
-    private static class Dad{
+    private static class Dad {
 
     }
-    private static class Son extends Dad{
+
+    private static class Son extends Dad {
 
     }
 }

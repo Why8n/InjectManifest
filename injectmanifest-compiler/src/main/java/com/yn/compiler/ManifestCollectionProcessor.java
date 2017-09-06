@@ -215,9 +215,39 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                                Element element) {
         String activityName = Utils.getProperName(
                 mElementUtils.getPackageOf(element).getQualifiedName().toString(), activity.name());
-        NodeActivity nodeActivity = (NodeActivity) (new NodeActivity(activityName)
-                .addAttr(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, activityName))
-                .addAttr(AndroidManifest.ActivityCollection.KEY_ATTR_LABEL, activity.label());
+        NodeActivity nodeActivity = new NodeActivity(activityName)
+                .name(activityName)
+                .allowEmbedded(activity.allowEmbedded().getResult())
+                .allowTaskReparenting(activity.allowTaskReparenting().getResult())
+                .alwaysRetainTaskState(activity.alwaysRetainTaskState().getResult())
+                .autoRemoveFromRecents(activity.autoRemoveFromRecents().getResult())
+                .banner(activity.banner())
+                .clearTaskOnLaunch(activity.clearTaskOnLaunch().getResult())
+                .configChanges(activity.configChanges())
+                .documentLaunchMode(activity.documentLaunchMode())
+                .enabled(activity.enabled().getResult())
+                .excludeFromRecents(activity.excludeFromRecents().getResult())
+                .exported(activity.exported().getResult())
+                .finishOnTaskLaunch(activity.finishOnTaskLaunch().getResult())
+                .hardwareAccelerated(activity.hardwareAccelerated().getResult())
+                .icon(activity.icon())
+                .label(activity.label())
+                .launchMode(activity.launchMode())
+                .maxRecents(activity.maxRecents())
+                .multiprocess(activity.multiprocess().getResult())
+                .noHistory(activity.noHistory().getResult())
+                .parentActivityName(activity.parentActivityName())
+                .permission(activity.permission())
+                .process(activity.process())
+                .relinquishTaskIdentity(activity.relinquishTaskIdentity().getResult())
+                .resizeableActivity(activity.resizeableActivity().getResult())
+                .screenOrientation(activity.screenOrientation())
+                .stateNotNeeded(activity.stateNotNeeded().getResult())
+                .supportsPictureInPicture(activity.supportsPictureInPicture().getResult())
+                .taskAffinity(activity.taskAffinity())
+                .theme(activity.theme())
+                .uiOptions(activity.uiOptions())
+                .windowSoftInputMode(activity.windowSoftInputMode());
         InjectIntentFilter intentFilter = activity.getClass().getAnnotation(InjectIntentFilter.class);
         if (intentFilter != null) {
             String[] actions = intentFilter.action();
