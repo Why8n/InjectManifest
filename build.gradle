@@ -1,0 +1,32 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+        maven {//本地Maven仓库地址
+            url uri('D:/Android/repos')
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.2'
+        //格式为-->group:module:version
+        classpath 'com.whyn.plugin:injectmanifest:1.0.0'
+//        classpath group: 'com.whyn.plugin', name: 'injectmanifest', version: '1.0.0'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+gradle.afterProject { project ->
+    println('Project ' + project + '  has evaluated')
+}

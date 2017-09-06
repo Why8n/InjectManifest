@@ -1,0 +1,1 @@
+include ':sample', ':injectmanifest-compiler', ':injectmanifest-annotations', ':injectmanifest-plugin'
