@@ -18,7 +18,7 @@ public abstract class AndroidManifest<T> {
     private static final String QUALIFIED_NAME_APPLICATION = "application";
     private static final String QUALIFIED_NAME_ACTIVITY = "activity";
     private static final String QUALIFIED_NAME_SERVICE = "service";
-    private static final String QUALIFIED_NAME_PERMISSION = "uses-permission";
+    private static final String QUALIFIED_NAME_USESPERMISSION = "uses-permission";
     private static final String QUALIFIED_NAME_INTENTFILTER = "intent-filter";
     private static final String QUALIFIED_NAME_ACTION = "action";
     private static final String QUALIFIED_NAME_CATEGORY = "category";
@@ -180,12 +180,12 @@ public abstract class AndroidManifest<T> {
         }
     }
 
-    public static class PermissionCollection extends AndroidManifest<String> {
+    public static class UsesPermissionCollection extends AndroidManifest<NodeUsesPermission> {
         @Override
         public void write2File(INode nodeWriter) {
             try {
-                for (String permission : mCollections) {
-                    nodeWriter.startTag(mQualifiedName, new Attribute(KEY_ATTR_NAME, permission));
+                for (NodeUsesPermission permission : mCollections) {
+                    nodeWriter.startTag(mQualifiedName, permission.asSet());
                     nodeWriter.endTag(mQualifiedName);
                 }
             } catch (Exception e) {
@@ -194,17 +194,20 @@ public abstract class AndroidManifest<T> {
         }
 
         @Override
+        public void collect(NodeUsesPermission item) {
+            mCollections.add(item);
+        }
+
+        @Override
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (!qName.equals(mQualifiedName))
                 return;
-            for (Attribute attr : attributes) {
-                collect(attr.value);
-            }
+            collect(new NodeUsesPermission().addAttr(attributes));
         }
 
         @Override
         public String setQName() {
-            return QUALIFIED_NAME_PERMISSION;
+            return QUALIFIED_NAME_USESPERMISSION;
         }
     }
 
@@ -281,7 +284,7 @@ public abstract class AndroidManifest<T> {
             try {
                 for (NodeActivity activity : mCollections) {
                     nodeWriter.startTag(mQualifiedName, activity.attrs.all());
-                    Utils.note("activity.intentFilter.size="+activity.intentFilter.datas.all().size());
+                    Utils.note("activity.intentFilter.size=" + activity.intentFilter.datas.all().size());
                     writeIntentFilter2File(nodeWriter, activity.intentFilter);
                     nodeWriter.endTag(mQualifiedName);
                 }

@@ -6,9 +6,10 @@ import com.yn.annotations.InjectApp;
 import com.yn.annotations.InjectData;
 import com.yn.annotations.InjectIntentFilter;
 import com.yn.annotations.InjectManifest;
-import com.yn.annotations.InjectUsesPermission;
 import com.yn.annotations.InjectReceiver;
 import com.yn.annotations.InjectService;
+import com.yn.annotations.InjectUsesPermission;
+import com.yn.annotations.InjectUsesPermissionDetail;
 import com.yn.component.AndroidManifest;
 import com.yn.component.Collections;
 import com.yn.component.ComponentBasic;
@@ -17,6 +18,7 @@ import com.yn.component.NodeApp;
 import com.yn.component.NodeManifest;
 import com.yn.component.NodeReceiver;
 import com.yn.component.NodeService;
+import com.yn.component.NodeUsesPermission;
 import com.yn.component.bean.DataAttribute;
 import com.yn.utils.Utils;
 import com.yn.xmls.factory.XmlFactory;
@@ -119,7 +121,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     private Collections preparedAndroidManifest() {
         Collections manifest = new Collections();
         manifest.plantComponent(new AndroidManifest.ManifestCollection(), TAG_MANIFEST);
-        manifest.plantComponent(new AndroidManifest.PermissionCollection(), TAG_PERMISSION);
+        manifest.plantComponent(new AndroidManifest.UsesPermissionCollection(), TAG_PERMISSION);
         manifest.plantComponent(new AndroidManifest.ApplicationCollection(), TAG_APPLICATION);
         manifest.plantComponent(new AndroidManifest.ActivityCollection(), TAG_ACTIVITY);
         manifest.plantComponent(new AndroidManifest.ServiceCollection(), TAG_SERVICE);
@@ -377,20 +379,27 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     }
 
     private void parsePermission(RoundEnvironment roundEnvironment, final Collections manifest) {
-        AndroidManifest.PermissionCollection permissionCollection =
-                (AndroidManifest.PermissionCollection) manifest.getTag(TAG_PERMISSION);
-        checkCollection(permissionCollection, AndroidManifest.PermissionCollection.class, TAG_PERMISSION);
+        AndroidManifest.UsesPermissionCollection usesPermissionCollection =
+                (AndroidManifest.UsesPermissionCollection) manifest.getTag(TAG_PERMISSION);
+        checkCollection(usesPermissionCollection, AndroidManifest.UsesPermissionCollection.class, TAG_PERMISSION);
 
         for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectUsesPermission.class)) {
             InjectUsesPermission permissions = element.getAnnotation(InjectUsesPermission.class);
-            parsePermission(permissionCollection, permissions);
+            parsePermission(usesPermissionCollection, permissions);
             isNeedGenerateXml = true;
         }
     }
 
-    private void parsePermission(AndroidManifest.PermissionCollection collections, InjectUsesPermission permissions) {
+    private void parsePermission(AndroidManifest.UsesPermissionCollection collections, InjectUsesPermission permissions) {
         for (String permission : permissions.value()) {
-            collections.collect(permission);
+            collections.collect(new NodeUsesPermission().permission(permission));
+        }
+        InjectUsesPermissionDetail[] permissionDetails = permissions.permission();
+        for (InjectUsesPermissionDetail permissionDetail : permissionDetails) {
+            collections.collect(new NodeUsesPermission()
+                    .permission(permissionDetail.permission())
+                    .maxSdkVersion(permissionDetail.maxSdkVersion())
+            );
         }
     }
 
