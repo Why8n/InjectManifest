@@ -11,24 +11,20 @@ class InjectManifest implements Plugin<Project> {
         project.extensions.create('manifestPath', ManifestConfigExt, project)
 
         project.afterEvaluate {
+            Map<String, String> arguments = new HashMap<String, String>()
+//            arguments.put("AndroidManifestPath", project.android.sourceSets.main.manifest.srcFile.absolutePath)
+            arguments.put("AndroidManifestPath",project.manifestPath.originManifestPath);
+            project.android.defaultConfig.javaCompileOptions.annotationProcessorOptions.arguments = arguments
+            print "path============="
+            println "${project.android.defaultConfig.javaCompileOptions.annotationProcessorOptions.arguments["AndroidManifestPath"]}"
 
-//            project.android.applicationVariants.all{ variant ->
-//                variant.outputs.each { output ->
-////                    aptOutput = new File("${project.buildDir}/source/apt_generated/${variant.dirName}")
-//                    println "****************************"
-//                    println "variant: ${output.name}"
-//                    println "manifest:  ${output.processResources.manifestFile}"
-////                    println "aptOutput:  ${aptOutput}"
-//                    println "****************************"
-//                    output.processResources.manifestFile = new File(project.manifestPath.originManifestPath)
-//                }
+//            def variants = determineVariants(project)
+//
+//            project.android[variants].all { variant ->
+//                configureVariant(project, variant)
 //            }
 
-            def variants = determineVariants(project)
 
-            project.android[variants].all { variant ->
-                configureVariant(project, variant)
-            }
         }
     }
 

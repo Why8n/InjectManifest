@@ -39,4 +39,5 @@ public @interface InjectReceiver {
     String process() default "";
 
     InjectIntentFilter intentFilter() default @InjectIntentFilter;
+    InjectMetaData[] metaData() default {};
 }

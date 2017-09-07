@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.yn.annotations.InjectApp;
 import com.yn.annotations.InjectManifest;
+import com.yn.annotations.InjectMetaData;
 
 import static com.yn.annotations.InjectManifest.InstallLocation.INTERNAL_ONLY;
 
@@ -16,6 +17,8 @@ import static com.yn.annotations.InjectManifest.InstallLocation.INTERNAL_ONLY;
         installLocation = INTERNAL_ONLY,
         sharedUserId = "android.uid.system"
 )
-@InjectApp(name = ".App",label = "i am app")
+@InjectApp(name = ".App", label = "i am app",
+        metaData = @InjectMetaData(name = "app/meta-data")
+)
 public class App extends Application {
 }

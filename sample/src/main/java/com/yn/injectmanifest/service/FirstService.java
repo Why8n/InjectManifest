@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 import com.yn.annotations.InjectData;
 import com.yn.annotations.InjectIntentFilter;
+import com.yn.annotations.InjectMetaData;
 import com.yn.annotations.InjectService;
 
 import static com.yn.annotations.enums.Correct.TRUE;
@@ -31,7 +32,8 @@ import static com.yn.annotations.enums.Correct.TRUE;
                         port = "-2",
                         scheme = "file"
                 )
-        )
+        ),
+        metaData = @InjectMetaData(name = "com.yn.meta-data.service")
 )
 public class FirstService extends Service {
     @Nullable

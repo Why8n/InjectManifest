@@ -2,6 +2,7 @@ package com.yn.component;
 
 import com.yn.component.bean.Attribute;
 import com.yn.component.bean.DataAttribute;
+import com.yn.component.bean.MetaData;
 import com.yn.utils.Utils;
 import com.yn.xmls.interfaces.INode;
 
@@ -23,6 +24,7 @@ public abstract class AndroidManifest<T> {
     private static final String QUALIFIED_NAME_ACTION = "action";
     private static final String QUALIFIED_NAME_CATEGORY = "category";
     private static final String QUALIFIED_NAME_DATA = "data";
+    private static final String QUALIFIED_NAME_METADATA = "meta-data";
 
 
     public static final String DOT = ".";
@@ -84,6 +86,13 @@ public abstract class AndroidManifest<T> {
                 nodeWriter.endTag(QUALIFIED_NAME_DATA);
             }
             nodeWriter.endTag(QUALIFIED_NAME_INTENTFILTER);
+        }
+    }
+
+    protected void writeMetaData2File(INode nodeWriter, NodeMetaData metaDatas) throws Exception {
+        for (MetaData metaData : metaDatas.metaDatas) {
+            nodeWriter.startTag(QUALIFIED_NAME_METADATA, metaData.asSet());
+            nodeWriter.endTag(QUALIFIED_NAME_METADATA);
         }
     }
 
@@ -154,6 +163,7 @@ public abstract class AndroidManifest<T> {
         public void write2File(INode nodeWriter) {
             try {
                 nodeWriter.startTag(mQualifiedName, mApp.attrs.all());
+                writeMetaData2File(nodeWriter, mApp.metaDatas);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -284,8 +294,8 @@ public abstract class AndroidManifest<T> {
             try {
                 for (NodeActivity activity : mCollections) {
                     nodeWriter.startTag(mQualifiedName, activity.attrs.all());
-                    Utils.note("activity.intentFilter.size=" + activity.intentFilter.datas.all().size());
                     writeIntentFilter2File(nodeWriter, activity.intentFilter);
+                    writeMetaData2File(nodeWriter, activity.metaDatas);
                     nodeWriter.endTag(mQualifiedName);
                 }
                 if (isLastElement) {
@@ -296,7 +306,6 @@ public abstract class AndroidManifest<T> {
                 e.printStackTrace();
             }
         }
-
 
         @Override
         public String setQName() {
@@ -345,6 +354,7 @@ public abstract class AndroidManifest<T> {
                 for (NodeService service : mCollections) {
                     nodeWriter.startTag(mQualifiedName, service.attrs.all());
                     writeIntentFilter2File(nodeWriter, service.intentFilter);
+                    writeMetaData2File(nodeWriter, service.metaDatas);
                     nodeWriter.endTag(mQualifiedName);
                 }
                 if (isLastElement) {
@@ -414,6 +424,7 @@ public abstract class AndroidManifest<T> {
                 for (NodeReceiver receiver : mCollections) {
                     nodeWriter.startTag(mQualifiedName, receiver.attrs.all());
                     writeIntentFilter2File(nodeWriter, receiver.intentFilter);
+                    writeMetaData2File(nodeWriter, receiver.metaDatas);
                     nodeWriter.endTag(mQualifiedName);
                 }
                 if (isLastElement) {

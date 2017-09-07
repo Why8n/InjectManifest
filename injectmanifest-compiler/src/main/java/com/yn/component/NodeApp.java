@@ -2,6 +2,7 @@ package com.yn.component;
 
 import com.yn.annotations.enums.UiOptions;
 import com.yn.component.bean.Attribute;
+import com.yn.component.bean.MetaData;
 
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import java.util.Set;
 
 public class NodeApp {
     final Attrs attrs = new Attrs();
+    final NodeMetaData metaDatas = new NodeMetaData();
 
 
     public NodeApp addAllAttr(Set<Attribute> attributes) {
@@ -20,6 +22,7 @@ public class NodeApp {
 
     public void copy(NodeApp newItem) {
         this.attrs.addAllAttr(newItem.attrs.all());
+        this.metaDatas.addAll(newItem.metaDatas);
     }
 
     //    android:allowTaskReparenting=["true" | "false"]
@@ -247,6 +250,11 @@ public class NodeApp {
     //    android:vmSafeMode=["true" | "false"]
     public NodeApp vmSafeMode(String bRet) {
         attrs.addAttr("android:vmSafeMode", bRet);
+        return this;
+    }
+
+    public NodeApp addMetaData(MetaData metaData) {
+        metaDatas.addMetaData(metaData);
         return this;
     }
 

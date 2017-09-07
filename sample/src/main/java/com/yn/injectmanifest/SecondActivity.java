@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.yn.annotations.InjectActivity;
 import com.yn.annotations.InjectIntentFilter;
+import com.yn.annotations.InjectMetaData;
 import com.yn.annotations.InjectUsesPermission;
 import com.yn.annotations.InjectUsesPermissionDetail;
 
@@ -19,7 +20,12 @@ import com.yn.annotations.InjectUsesPermissionDetail;
         intentFilter = @InjectIntentFilter(
 //                action = {"com.yn.test"},
                 category = "com.yn.category"
-        ))
+        ),
+        metaData = {
+                @InjectMetaData(value = "second activity meta-data value"),
+                @InjectMetaData(resource = "second activity meta-data resource"),
+        }
+)
 public class SecondActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

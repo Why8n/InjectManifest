@@ -56,13 +56,14 @@ public final class Utils {
     public static void error(String format, Object... args) {
         error(String.format(format, args));
     }
-    public static void error(Element element,String msg) {
+
+    public static void error(Element element, String msg) {
         checkMessager();
-        sMessager.printMessage(Diagnostic.Kind.ERROR, msg,element);
+        sMessager.printMessage(Diagnostic.Kind.ERROR, msg, element);
     }
 
-    public static void error(Element element,String format, Object... args) {
-        error(element,String.format(format, args));
+    public static void error(Element element, String format, Object... args) {
+        error(element, String.format(format, args));
     }
 
     private static void checkMessager() {
@@ -168,5 +169,9 @@ public final class Utils {
                 return item;
         }
         return null;
+    }
+
+    public static boolean isEmpty(String newData) {
+        return newData == null || newData.isEmpty();
     }
 }

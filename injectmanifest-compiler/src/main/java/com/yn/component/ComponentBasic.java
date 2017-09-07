@@ -6,6 +6,7 @@ package com.yn.component;
 
 import com.yn.component.bean.Attribute;
 import com.yn.component.bean.DataAttribute;
+import com.yn.component.bean.MetaData;
 import com.yn.utils.Utils;
 
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.Set;
  */
 public class ComponentBasic extends NodeBasic {
     NodeIntentFilter intentFilter = new NodeIntentFilter();
+    NodeMetaData metaDatas = new NodeMetaData();
 
     public ComponentBasic(String name) {
         super(name);
@@ -60,7 +62,6 @@ public class ComponentBasic extends NodeBasic {
     }
 
     public ComponentBasic addData(DataAttribute data) {
-        Utils.note("DataAttribute:processor: hashcode=%d", data.hashCode());
         intentFilter.addData(data);
         return this;
     }
@@ -70,7 +71,6 @@ public class ComponentBasic extends NodeBasic {
         for (Attribute _data : data) {
             dataAttribute.addAttr(_data);
         }
-        Utils.note("DataAttribute:xml: hashcode=%d", dataAttribute.hashCode());
         intentFilter.addData(dataAttribute);
         return this;
     }
@@ -81,5 +81,10 @@ public class ComponentBasic extends NodeBasic {
 //        this.name = other.name;
         this.attrs.addAllAttr(other.attrs.all());
         this.intentFilter.copy(other.intentFilter);
+        this.metaDatas.addAll(other.metaDatas);
+    }
+
+    public void addMetaData(MetaData metaData) {
+        metaDatas.addMetaData(metaData);
     }
 }

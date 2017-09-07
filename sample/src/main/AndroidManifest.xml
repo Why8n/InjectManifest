@@ -21,6 +21,9 @@
                 <data
                     android:mimeType="video/mp4"
                     android:scheme="https" />
+                <meta-data
+                    android:name="zoo"
+                    android:value="@string/app_name" />
             </intent-filter>
         </activity>
     </application>

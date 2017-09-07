@@ -46,4 +46,5 @@ public @interface InjectService {
     String process() default "";
 
     InjectIntentFilter intentFilter() default @InjectIntentFilter;
+    InjectMetaData[] metaData() default {};
 }

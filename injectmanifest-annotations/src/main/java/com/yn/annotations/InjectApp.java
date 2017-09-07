@@ -128,4 +128,6 @@ public @interface InjectApp {
 
     //    android:vmSafeMode=["true" | "false"]
     Correct vmSafeMode() default Correct.NONE;
+
+    InjectMetaData[] metaData() default {};
 }

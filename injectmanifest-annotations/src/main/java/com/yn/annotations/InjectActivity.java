@@ -277,4 +277,5 @@ public @interface InjectActivity {
     }
 
     InjectIntentFilter intentFilter() default @InjectIntentFilter;
+    InjectMetaData[] metaData() default {};
 }

@@ -6,6 +6,7 @@ import com.yn.annotations.InjectApp;
 import com.yn.annotations.InjectData;
 import com.yn.annotations.InjectIntentFilter;
 import com.yn.annotations.InjectManifest;
+import com.yn.annotations.InjectMetaData;
 import com.yn.annotations.InjectReceiver;
 import com.yn.annotations.InjectService;
 import com.yn.annotations.InjectUsesPermission;
@@ -20,6 +21,7 @@ import com.yn.component.NodeReceiver;
 import com.yn.component.NodeService;
 import com.yn.component.NodeUsesPermission;
 import com.yn.component.bean.DataAttribute;
+import com.yn.component.bean.MetaData;
 import com.yn.utils.Utils;
 import com.yn.xmls.factory.XmlFactory;
 import com.yn.xmls.interfaces.IXml;
@@ -113,6 +115,8 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         if (!parseReceiver(roundEnvironment, androidManifest))
             return false;
         parsePermission(roundEnvironment, androidManifest);
+        if (xmlDecoder == null)
+            xmlDecoder = XmlFactory.createXmlDecoder(androidManifest);
 
         return isNeedGenerateXml ? generatedXml(xmlDecoder) : false;
 
@@ -182,8 +186,8 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 .label(receiver.label())
                 .permission(receiver.permission())
                 .process(receiver.process());
-        Utils.note("receiver-------------------------------");
         parseIntentFilter(nodeReceiver, receiver.intentFilter());
+        parseMetaData(nodeReceiver, receiver.metaData());
         receiverCollection.collect(nodeReceiver);
     }
 
@@ -213,8 +217,8 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 .label(service.label())
                 .permission(service.permission())
                 .process(service.process());
-        Utils.note("service-------------------------------");
         parseIntentFilter(nodeService, service.intentFilter());
+        parseMetaData(nodeService, service.metaData());
         serviceCollection.collect(nodeService);
     }
 
@@ -271,9 +275,29 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 .theme(activity.theme())
                 .uiOptions(activity.uiOptions())
                 .windowSoftInputMode(activity.windowSoftInputMode());
-        Utils.note("activity-------------------------------");
         parseIntentFilter(nodeActivity, activity.intentFilter());
+        parseMetaData(nodeActivity, activity.metaData());
         collections.collect(nodeActivity);
+    }
+
+    private <T extends ComponentBasic> void parseMetaData(T nodeComponent, InjectMetaData[] injectMetaDatas) {
+        for (InjectMetaData metaData : injectMetaDatas) {
+            nodeComponent.addMetaData(new MetaData()
+                    .name(metaData.name())
+                    .resource(metaData.resource())
+                    .value(metaData.value())
+            );
+        }
+    }
+
+    private void parseMetaData(NodeApp nodeComponent, InjectMetaData[] injectMetaDatas) {
+        for (InjectMetaData metaData : injectMetaDatas) {
+            nodeComponent.addMetaData(new MetaData()
+                    .name(metaData.name())
+                    .resource(metaData.resource())
+                    .value(metaData.value())
+            );
+        }
     }
 
     private <T extends ComponentBasic> void parseIntentFilter(T nodeComponent, InjectIntentFilter intentFilter) {
@@ -335,47 +359,47 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
 
     private void parseApp(AndroidManifest.ApplicationCollection appCollection, InjectApp app, Element element) {
         String appName = Utils.getProperName(mElementUtils.getPackageOf(element).toString(), app.name());
-        appCollection.collect(
-                new NodeApp()
-                        .name(appName)
-                        .allowTaskReparenting(app.allowTaskReparenting().getResult())
-                        .allowBackup(app.allowBackup().getResult())
-                        .allowClearUserData(app.allowClearUserData().getResult())
-                        .backupAgent(app.backupAgent())
-                        .backupInForeground(app.backupInForeground().getResult())
-                        .banner(app.banner())
-                        .debuggable(app.debuggable().getResult())
-                        .description(app.description())
-                        .directBootAware(app.directBootAware().getResult())
-                        .enabled(app.enabled().getResult())
-                        .extractNativeLibs(app.extractNativeLibs().getResult())
-                        .fullBackupContent(app.fullBackupContent())
-                        .fullBackupOnly(app.fullBackupOnly().getResult())
-                        .hasCode(app.hasCode().getResult())
-                        .hardwareAccelerated(app.hardwareAccelerated().getResult())
-                        .icon(app.icon())
-                        .isGame(app.isGame().getResult())
-                        .killAfterRestore(app.killAfterRestore().getResult())
-                        .largeHeap(app.largeHeap().getResult())
-                        .label(app.label())
-                        .logo(app.logo())
-                        .manageSpaceActivity(app.manageSpaceActivity())
-                        .networkSecurityConfig(app.networkSecurityConfig())
-                        .permission(app.permission())
-                        .persistent(app.persistent().getResult())
-                        .process(app.process())
-                        .restoreAnyVersion(app.restoreAnyVersion().getResult())
-                        .requiredAccountType(app.requiredAccountType())
-                        .resizeableActivity(app.resizeableActivity().getResult())
-                        .restrictedAccountType(app.restrictedAccountType())
-                        .supportsRtl(app.supportsRtl().getResult())
-                        .taskAffinity(app.taskAffinity())
-                        .testOnly(app.testOnly().getResult())
-                        .theme(app.theme())
-                        .allowTaskReparenting(app.allowTaskReparenting().getResult())
-                        .usesCleartextTraffic(app.usesCleartextTraffic().getResult())
-                        .vmSafeMode(app.vmSafeMode().getResult())
-        );
+        NodeApp nodeApp = new NodeApp()
+                .name(appName)
+                .allowTaskReparenting(app.allowTaskReparenting().getResult())
+                .allowBackup(app.allowBackup().getResult())
+                .allowClearUserData(app.allowClearUserData().getResult())
+                .backupAgent(app.backupAgent())
+                .backupInForeground(app.backupInForeground().getResult())
+                .banner(app.banner())
+                .debuggable(app.debuggable().getResult())
+                .description(app.description())
+                .directBootAware(app.directBootAware().getResult())
+                .enabled(app.enabled().getResult())
+                .extractNativeLibs(app.extractNativeLibs().getResult())
+                .fullBackupContent(app.fullBackupContent())
+                .fullBackupOnly(app.fullBackupOnly().getResult())
+                .hasCode(app.hasCode().getResult())
+                .hardwareAccelerated(app.hardwareAccelerated().getResult())
+                .icon(app.icon())
+                .isGame(app.isGame().getResult())
+                .killAfterRestore(app.killAfterRestore().getResult())
+                .largeHeap(app.largeHeap().getResult())
+                .label(app.label())
+                .logo(app.logo())
+                .manageSpaceActivity(app.manageSpaceActivity())
+                .networkSecurityConfig(app.networkSecurityConfig())
+                .permission(app.permission())
+                .persistent(app.persistent().getResult())
+                .process(app.process())
+                .restoreAnyVersion(app.restoreAnyVersion().getResult())
+                .requiredAccountType(app.requiredAccountType())
+                .resizeableActivity(app.resizeableActivity().getResult())
+                .restrictedAccountType(app.restrictedAccountType())
+                .supportsRtl(app.supportsRtl().getResult())
+                .taskAffinity(app.taskAffinity())
+                .testOnly(app.testOnly().getResult())
+                .theme(app.theme())
+                .allowTaskReparenting(app.allowTaskReparenting().getResult())
+                .usesCleartextTraffic(app.usesCleartextTraffic().getResult())
+                .vmSafeMode(app.vmSafeMode().getResult());
+        parseMetaData(nodeApp, app.metaData());
+        appCollection.collect(nodeApp);
     }
 
     private void parsePermission(RoundEnvironment roundEnvironment, final Collections manifest) {
