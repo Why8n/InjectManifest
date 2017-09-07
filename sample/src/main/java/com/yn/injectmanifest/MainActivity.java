@@ -8,12 +8,12 @@ import android.view.View;
 
 import com.yn.annotations.InjectActivity;
 import com.yn.annotations.InjectIntentFilter;
-import com.yn.annotations.InjectPermissions;
+import com.yn.annotations.InjectUsesPermission;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@InjectPermissions({
+@InjectUsesPermission({
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
 })
@@ -24,17 +24,17 @@ import java.util.List;
                 category = {"android.intent.category.LAUNCHER","android.intent.category.whyn"}
         ))
 public class MainActivity extends AppCompatActivity {
-    @InjectPermissions(Manifest.permission.SEND_SMS)
+    @InjectUsesPermission(Manifest.permission.SEND_SMS)
     String field1;
 
-    @InjectPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
+    @InjectUsesPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
 
-    @InjectPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
+    @InjectUsesPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     public void onStartActivity(View view) {
         startActivity(new Intent(this, SecondActivity.class));
         test(new Son());

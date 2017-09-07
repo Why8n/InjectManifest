@@ -6,7 +6,7 @@ import com.yn.annotations.InjectApp;
 import com.yn.annotations.InjectData;
 import com.yn.annotations.InjectIntentFilter;
 import com.yn.annotations.InjectManifest;
-import com.yn.annotations.InjectPermissions;
+import com.yn.annotations.InjectUsesPermission;
 import com.yn.annotations.InjectReceiver;
 import com.yn.annotations.InjectService;
 import com.yn.component.AndroidManifest;
@@ -69,7 +69,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotations = new HashSet<>();
-        annotations.add(InjectPermissions.class.getCanonicalName());
+        annotations.add(InjectUsesPermission.class.getCanonicalName());
         annotations.add(InjectActivity.class.getCanonicalName());
         annotations.add(InjectService.class.getCanonicalName());
         return annotations;
@@ -378,14 +378,14 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 (AndroidManifest.PermissionCollection) manifest.getTag(TAG_PERMISSION);
         checkCollection(permissionCollection, AndroidManifest.PermissionCollection.class, TAG_PERMISSION);
 
-        for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectPermissions.class)) {
-            InjectPermissions permissions = element.getAnnotation(InjectPermissions.class);
+        for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectUsesPermission.class)) {
+            InjectUsesPermission permissions = element.getAnnotation(InjectUsesPermission.class);
             parsePermission(permissionCollection, permissions);
             isNeedGenerateXml = true;
         }
     }
 
-    private void parsePermission(AndroidManifest.PermissionCollection collections, InjectPermissions permissions) {
+    private void parsePermission(AndroidManifest.PermissionCollection collections, InjectUsesPermission permissions) {
         for (String permission : permissions.value()) {
             collections.collect(permission);
         }
