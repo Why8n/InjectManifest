@@ -34,4 +34,9 @@ public class Attribute {
         } while (false);
         return bRet;
     }
+
+    @Override
+    public String toString() {
+        return String.format("[%s,%s]", key, value);
+    }
 }

@@ -1,9 +1,11 @@
 package com.yn.component;
 
 import com.yn.component.bean.Attribute;
+import com.yn.component.bean.DataAttribute;
 import com.yn.utils.Utils;
 import com.yn.xmls.interfaces.INode;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +22,7 @@ public abstract class AndroidManifest<T> {
     private static final String QUALIFIED_NAME_INTENTFILTER = "intent-filter";
     private static final String QUALIFIED_NAME_ACTION = "action";
     private static final String QUALIFIED_NAME_CATEGORY = "category";
+    private static final String QUALIFIED_NAME_DATA = "data";
 
 
     public static final String DOT = ".";
@@ -63,6 +66,25 @@ public abstract class AndroidManifest<T> {
         if (other.mCollections.isEmpty())
             return false;
         return this.mCollections.addAll(other.mCollections);
+    }
+
+    protected void writeIntentFilter2File(INode nodeWriter, NodeIntentFilter intentFilter) throws Exception {
+        if (!intentFilter.isEmpty()) {
+            nodeWriter.startTag(QUALIFIED_NAME_INTENTFILTER, new HashSet<Attribute>());
+            for (Attribute action : intentFilter.actions.all()) {
+                nodeWriter.startTag(QUALIFIED_NAME_ACTION, action);
+                nodeWriter.endTag(QUALIFIED_NAME_ACTION);
+            }
+            for (Attribute category : intentFilter.categories.all()) {
+                nodeWriter.startTag(QUALIFIED_NAME_CATEGORY, category);
+                nodeWriter.endTag(QUALIFIED_NAME_CATEGORY);
+            }
+            for (DataAttribute data : intentFilter.datas.all()) {
+                nodeWriter.startTag(QUALIFIED_NAME_DATA, data.asSet());
+                nodeWriter.endTag(QUALIFIED_NAME_DATA);
+            }
+            nodeWriter.endTag(QUALIFIED_NAME_INTENTFILTER);
+        }
     }
 
 
@@ -225,46 +247,42 @@ public abstract class AndroidManifest<T> {
 
     public static class ActivityCollection extends ComponentBasicCollection<NodeActivity> {
 
-//        private String lastActivityName;
-//        private int lastAction = ACTION_NONE;
-//        private boolean isLastElement = false;
-
-
-//        @Override
-//        public boolean collect(NodeActivity item) {
-//            if (mCollections.contains(item)) {
-//                update(item);
-//                return true;
-//            }
-//            return mCollections.add(item);
-//        }
-
-//        private void update(final NodeActivity item) {
-//            for (NodeActivity curItem : mCollections) {
-//                if (curItem.equals(item)) {
-//                    curItem.copy(item);
-//                }
-//            }
-//        }
+        @Override
+        public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
+            if (qName.equals(mQualifiedName)) {
+                lastAction = ACTION_ACTIVITY;
+                String activityName = getNameFromSet(KEY_ATTR_NAME, attributes);
+                activityName = Utils.getProperName(sPackageName, activityName);
+                if (attributes != null && !attributes.isEmpty()) {
+                    collect((NodeActivity) new NodeActivity(lastComponentName = activityName).addAttr(attributes));
+                }
+                return;
+            }
+            if (!(lastAction == ACTION_ACTIVITY))
+                return;
+            if (QUALIFIED_NAME_ACTION.equals(qName)) {
+                if (attributes != null && !attributes.isEmpty()) {
+                    collect((NodeActivity) new NodeActivity(lastComponentName).addAction(attributes));
+                }
+            } else if (QUALIFIED_NAME_CATEGORY.equals(qName)) {
+                if (attributes != null && !attributes.isEmpty()) {
+                    collect((NodeActivity) new NodeActivity(lastComponentName).addCategory(attributes));
+                }
+            } else if (QUALIFIED_NAME_DATA.equals(qName)) {
+                if (attributes != null && !attributes.isEmpty()) {
+                    Utils.note("actiivity:data:attrs=" + Arrays.toString(attributes.toArray(new Attribute[attributes.size()])));
+                    collect((NodeActivity) new NodeActivity(lastComponentName).addData(attributes));
+                }
+            }
+        }
 
         @Override
         public void write2File(INode nodeWriter) {
             try {
                 for (NodeActivity activity : mCollections) {
-                    Utils.note("%s: attr= %s", activity.name, activity.attrs.all().toArray());
                     nodeWriter.startTag(mQualifiedName, activity.attrs.all());
-                    if (!activity.intentFilter.isEmpty()) {
-                        nodeWriter.startTag(QUALIFIED_NAME_INTENTFILTER, new HashSet<Attribute>());
-                        for (Attribute action : activity.intentFilter.actions.all()) {
-                            nodeWriter.startTag(QUALIFIED_NAME_ACTION, action);
-                            nodeWriter.endTag(QUALIFIED_NAME_ACTION);
-                        }
-                        for (Attribute category : activity.intentFilter.categories.all()) {
-                            nodeWriter.startTag(QUALIFIED_NAME_CATEGORY, category);
-                            nodeWriter.endTag(QUALIFIED_NAME_CATEGORY);
-                        }
-                        nodeWriter.endTag(QUALIFIED_NAME_INTENTFILTER);
-                    }
+                    Utils.note("activity.intentFilter.size="+activity.intentFilter.datas.all().size());
+                    writeIntentFilter2File(nodeWriter, activity.intentFilter);
                     nodeWriter.endTag(mQualifiedName);
                 }
                 if (isLastElement) {
@@ -276,38 +294,6 @@ public abstract class AndroidManifest<T> {
             }
         }
 
-//        private <T extends Attribute> String getFromSet(String targetName, Set<T> set) {
-//            for (T item : set) {
-//                if (item.key.equals(targetName))
-//                    return item.value;
-//            }
-//            return null;
-//        }
-
-
-        @Override
-        public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
-            if (qName.equals(mQualifiedName)) {
-                lastAction = ACTION_ACTIVITY;
-                String activityName = getNameFromSet(KEY_ATTR_NAME, attributes);
-                activityName = Utils.getProperName(sPackageName, activityName);
-                if (attributes != null && !attributes.isEmpty()) {
-                    collect((NodeActivity) new NodeActivity(lastComponentName = activityName).addAttr(attributes));
-                }
-            } else if (qName.equals(QUALIFIED_NAME_ACTION)) {
-                if (!(lastAction == ACTION_ACTIVITY))
-                    return;
-                if (attributes != null && !attributes.isEmpty()) {
-                    collect((NodeActivity) new NodeActivity(lastComponentName).addAction(attributes));
-                }
-            } else if (qName.equals(QUALIFIED_NAME_CATEGORY)) {
-                if (!(lastAction == ACTION_ACTIVITY))
-                    return;
-                if (attributes != null && !attributes.isEmpty()) {
-                    collect((NodeActivity) new NodeActivity(lastComponentName).addCategory(attributes));
-                }
-            }
-        }
 
         @Override
         public String setQName() {
@@ -355,18 +341,7 @@ public abstract class AndroidManifest<T> {
             try {
                 for (NodeService service : mCollections) {
                     nodeWriter.startTag(mQualifiedName, service.attrs.all());
-                    if (!service.intentFilter.isEmpty()) {
-                        nodeWriter.startTag(QUALIFIED_NAME_INTENTFILTER, new HashSet<Attribute>());
-                        for (Attribute action : service.intentFilter.actions.all()) {
-                            nodeWriter.startTag(QUALIFIED_NAME_ACTION, action);
-                            nodeWriter.endTag(QUALIFIED_NAME_ACTION);
-                        }
-                        for (Attribute category : service.intentFilter.categories.all()) {
-                            nodeWriter.startTag(QUALIFIED_NAME_CATEGORY, category);
-                            nodeWriter.endTag(QUALIFIED_NAME_CATEGORY);
-                        }
-                        nodeWriter.endTag(QUALIFIED_NAME_INTENTFILTER);
-                    }
+                    writeIntentFilter2File(nodeWriter, service.intentFilter);
                     nodeWriter.endTag(mQualifiedName);
                 }
                 if (isLastElement) {
@@ -378,14 +353,6 @@ public abstract class AndroidManifest<T> {
             }
         }
 
-//        private <T extends Attribute> String getFromSet(String targetName, Set<T> set) {
-//            for (T item : set) {
-//                if (item.key.equals(targetName))
-//                    return item.value;
-//            }
-//            return null;
-//        }
-
         @Override
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
@@ -395,17 +362,22 @@ public abstract class AndroidManifest<T> {
                 if (attributes != null && !attributes.isEmpty()) {
                     collect((NodeService) new NodeService(lastComponentName = serviceName).addAttr(attributes));
                 }
-            } else if (qName.equals(QUALIFIED_NAME_ACTION)) {
-                if (!(lastAction == ACTION_SERVICE))
-                    return;
+                return;
+            }
+            if (!(lastAction == ACTION_SERVICE))
+                return;
+
+            else if (QUALIFIED_NAME_ACTION.equals(qName)) {
                 if (attributes != null && !attributes.isEmpty()) {
                     collect((NodeService) new NodeService(lastComponentName).addAction(attributes));
                 }
-            } else if (qName.equals(QUALIFIED_NAME_CATEGORY)) {
-                if (!(lastAction == ACTION_SERVICE))
-                    return;
+            } else if (QUALIFIED_NAME_CATEGORY.equals(qName)) {
                 if (attributes != null && !attributes.isEmpty()) {
                     collect((NodeService) new NodeService(lastComponentName).addCategory(attributes));
+                }
+            } else if (qName.equals(QUALIFIED_NAME_DATA)) {
+                if (attributes != null && !attributes.isEmpty()) {
+                    collect((NodeService) new NodeService(lastComponentName).addData(attributes));
                 }
             }
         }
@@ -438,18 +410,7 @@ public abstract class AndroidManifest<T> {
             try {
                 for (NodeReceiver receiver : mCollections) {
                     nodeWriter.startTag(mQualifiedName, receiver.attrs.all());
-                    if (!receiver.intentFilter.isEmpty()) {
-                        nodeWriter.startTag(QUALIFIED_NAME_INTENTFILTER, new HashSet<Attribute>());
-                        for (Attribute action : receiver.intentFilter.actions.all()) {
-                            nodeWriter.startTag(QUALIFIED_NAME_ACTION, action);
-                            nodeWriter.endTag(QUALIFIED_NAME_ACTION);
-                        }
-                        for (Attribute category : receiver.intentFilter.categories.all()) {
-                            nodeWriter.startTag(QUALIFIED_NAME_CATEGORY, category);
-                            nodeWriter.endTag(QUALIFIED_NAME_CATEGORY);
-                        }
-                        nodeWriter.endTag(QUALIFIED_NAME_INTENTFILTER);
-                    }
+                    writeIntentFilter2File(nodeWriter, receiver.intentFilter);
                     nodeWriter.endTag(mQualifiedName);
                 }
                 if (isLastElement) {
@@ -470,17 +431,21 @@ public abstract class AndroidManifest<T> {
                 if (attributes != null && !attributes.isEmpty()) {
                     collect((NodeReceiver) new NodeReceiver(lastComponentName = receiverName).addAttr(attributes));
                 }
-            } else if (qName.equals(QUALIFIED_NAME_ACTION)) {
-                if (!(lastAction == ACTION_RECEIVER))
-                    return;
+                return;
+            }
+            if (!(lastAction == ACTION_RECEIVER))
+                return;
+            else if (QUALIFIED_NAME_ACTION.equals(qName)) {
                 if (attributes != null && !attributes.isEmpty()) {
                     collect((NodeReceiver) new NodeReceiver(lastComponentName).addAction(attributes));
                 }
-            } else if (qName.equals(QUALIFIED_NAME_CATEGORY)) {
-                if (!(lastAction == ACTION_RECEIVER))
-                    return;
+            } else if (QUALIFIED_NAME_CATEGORY.equals(qName)) {
                 if (attributes != null && !attributes.isEmpty()) {
                     collect((NodeReceiver) new NodeReceiver(lastComponentName).addCategory(attributes));
+                }
+            } else if (QUALIFIED_NAME_DATA.equals(qName)) {
+                if (attributes != null && !attributes.isEmpty()) {
+                    collect((NodeReceiver) new NodeActivity(lastComponentName).addData(attributes));
                 }
             }
         }

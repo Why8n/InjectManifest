@@ -32,7 +32,7 @@ public class SaxINodeImpl implements INode {
 
     //    startElement(String uri, String localName, String qName, Attributes atts)
     @Override
-    public void startTag(String tagName, Set<Attribute> attrs) throws Exception {
+    public void startTag(String tagName, Set<? extends Attribute> attrs) throws Exception {
         AttributesImpl attributes = new AttributesImpl();
         for (Attribute attr : attrs) {
             attributes.addAttribute("", "", attr.key, "", attr.value);

@@ -6,6 +6,7 @@ package com.yn.component;
 
 import com.yn.component.bean.Attribute;
 import com.yn.component.bean.DataAttribute;
+import com.yn.utils.Utils;
 
 import java.util.Set;
 
@@ -59,7 +60,18 @@ public class ComponentBasic extends NodeBasic {
     }
 
     public ComponentBasic addData(DataAttribute data) {
+        Utils.note("DataAttribute:processor: hashcode=%d", data.hashCode());
         intentFilter.addData(data);
+        return this;
+    }
+
+    public ComponentBasic addData(Set<Attribute> data) {
+        DataAttribute dataAttribute = new DataAttribute();
+        for (Attribute _data : data) {
+            dataAttribute.addAttr(_data);
+        }
+        Utils.note("DataAttribute:xml: hashcode=%d", dataAttribute.hashCode());
+        intentFilter.addData(dataAttribute);
         return this;
     }
 

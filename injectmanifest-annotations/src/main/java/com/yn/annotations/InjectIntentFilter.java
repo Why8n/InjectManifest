@@ -18,6 +18,6 @@ public @interface InjectIntentFilter {
 
     String[] category() default {};
 
-    InjectData[] data() default @InjectData;
+    InjectData[] data() default {};
 
 }

@@ -28,4 +28,19 @@ public class KVSameList<T extends Attribute> extends LinkedList<T> {
         }
         return bRet;
     }
+
+    public T get(final String key) {
+        T result = null;
+        do {
+            if (key == null)
+                break;
+            for (T item : this) {
+                if (item.key.equals(key)) {
+                    result = item;
+                    break;
+                }
+            }
+        } while (false);
+        return result;
+    }
 }

@@ -180,6 +180,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 .label(receiver.label())
                 .permission(receiver.permission())
                 .process(receiver.process());
+        Utils.note("receiver-------------------------------");
         parseIntentFilter(nodeReceiver, receiver.intentFilter());
         receiverCollection.collect(nodeReceiver);
     }
@@ -210,6 +211,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 .label(service.label())
                 .permission(service.permission())
                 .process(service.process());
+        Utils.note("service-------------------------------");
         parseIntentFilter(nodeService, service.intentFilter());
         serviceCollection.collect(nodeService);
     }
@@ -267,6 +269,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 .theme(activity.theme())
                 .uiOptions(activity.uiOptions())
                 .windowSoftInputMode(activity.windowSoftInputMode());
+        Utils.note("activity-------------------------------");
         parseIntentFilter(nodeActivity, activity.intentFilter());
         collections.collect(nodeActivity);
     }

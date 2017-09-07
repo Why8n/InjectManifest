@@ -15,7 +15,7 @@ import com.yn.annotations.InjectIntentFilter;
 @InjectActivity(name = "com.yn.injectmanifest.SecondActivity",
         label = "I'm Second Activity",
         intentFilter = @InjectIntentFilter(
-                action = {"com.yn.test"},
+//                action = {"com.yn.test"},
                 category = "com.yn.category"
         ))
 public class SecondActivity extends Activity {

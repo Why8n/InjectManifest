@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.yn.annotations.InjectActivity;
+import com.yn.annotations.InjectData;
 import com.yn.annotations.InjectIntentFilter;
 import com.yn.annotations.InjectUsesPermission;
 
@@ -18,10 +19,11 @@ import java.util.List;
         Manifest.permission.WRITE_EXTERNAL_STORAGE
 })
 @InjectActivity(
-        name= "com.yn.injectmanifest.MainActivity",
+        name = ".MainActivity",
         intentFilter = @InjectIntentFilter(
                 action = {"android.intent.action.MAIN", "android.intent.action_whyn_test"},
-                category = {"android.intent.category.LAUNCHER","android.intent.category.whyn"}
+                category = {"android.intent.category.LAUNCHER", "android.intent.category.whyn"},
+                data = @InjectData(mimeType = "image/*")
         ))
 public class MainActivity extends AppCompatActivity {
     @InjectUsesPermission(Manifest.permission.SEND_SMS)

@@ -1,8 +1,8 @@
 package com.yn.component;
 
 import com.yn.component.bean.DataAttribute;
-import com.yn.structure.RidLastSet;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -10,7 +10,7 @@ import java.util.Set;
  */
 
 public class NodeData {
-    private Set<DataAttribute> attrs = new RidLastSet<>();
+    private Set<DataAttribute> attrs = new HashSet<>();
 
     public void addData(DataAttribute data) {
         attrs.add(data);

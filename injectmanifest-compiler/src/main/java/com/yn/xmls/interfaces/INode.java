@@ -13,7 +13,7 @@ public interface INode {
 
     void endDocument() throws Exception;
 
-    void startTag(String tagName, Set<Attribute> attrs) throws Exception;
+    void startTag(String tagName, Set<? extends Attribute> attrs) throws Exception;
 
     void startTag(String tagName, Attribute attr) throws Exception;
 
