@@ -1,6 +1,7 @@
 package com.yn.component;
 
 import com.yn.annotations.InjectActivity;
+import com.yn.annotations.enums.UiOptions;
 import com.yn.utils.Utils;
 
 /**
@@ -208,7 +209,7 @@ public class NodeActivity extends ComponentBasic {
     }
 
     //    android:uiOptions=["none"|"splitActionBarWhenNarrow"]
-    public NodeActivity uiOptions(InjectActivity.UiOptions uiOptions) {
+    public NodeActivity uiOptions(UiOptions uiOptions) {
         attrs.addAttr("android:uiOptions", uiOptions.getUiOptions());
         return this;
     }

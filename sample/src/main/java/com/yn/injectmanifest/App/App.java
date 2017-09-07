@@ -13,8 +13,9 @@ import static com.yn.annotations.InjectManifest.InstallLocation.INTERNAL_ONLY;
 
 
 @InjectManifest(
-        installLocation = INTERNAL_ONLY
+        installLocation = INTERNAL_ONLY,
+        sharedUserId = "android.uid.system"
 )
-@InjectApp(name = ".App")
+@InjectApp(name = ".App",label = "i am app")
 public class App extends Application {
 }

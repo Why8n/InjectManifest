@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yn.injectmanifest"
-    android:installLocation="internalOnly">
+    package="com.yn.injectmanifest">
 
-    <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <application
-        android:name="com.yn.injectmanifest.App.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -18,29 +12,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.yn.injectmanifest.MainActivity"
+            android:name=".MainActivity"
             android:label="hahahaha">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action_whyn_test" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.yn.injectmanifest.SecondActivity"
-            android:label="I'm Second Activity">
-            <intent-filter>
-                <action android:name="com.yn.test" />
-                <category android:name="com.yn.category" />
-            </intent-filter>
-        </activity>
 
-        <service
-            android:name="com.yn.injectmanifest.service.FirstService"
-            android:label="Inject Service test" />
-        <receiver
-            android:name="com.yn.injectmanifest.receivers.FirstReceiver"
-            android:label="hi i am first receiver" />
+            </intent-filter>
+            <meta-data
+                android:name="MainActivity"
+                android:resource="@mipmap/ic_launcher"
+                android:value="string" />
+        </activity>
     </application>
+
 </manifest>

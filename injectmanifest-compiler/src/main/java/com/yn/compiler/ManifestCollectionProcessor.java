@@ -170,9 +170,16 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     private void parseReceiver(AndroidManifest.ReceiverCollection receiverCollection, InjectReceiver receiver, Element element) {
         String receiverName = Utils.getProperName(mElementUtils.getPackageOf(element).getQualifiedName().toString(),
                 receiver.name());
-        receiverCollection.collect((NodeReceiver) new NodeReceiver(receiverName)
-                .addAttr(AndroidManifest.ReceiverCollection.KEY_ATTR_NAME, receiverName)
-                .addAttr(AndroidManifest.ReceiverCollection.KEY_ATTR_LABEL, receiver.label())
+        receiverCollection.collect(
+                new NodeReceiver(receiverName)
+                        .name(receiverName)
+                        .directBootAware(receiver.directBootAware().getResult())
+                        .enabled(receiver.enabled().getResult())
+                        .exported(receiver.exported().getResult())
+                        .icon(receiver.icon())
+                        .label(receiver.label())
+                        .permission(receiver.permission())
+                        .process(receiver.process())
         );
     }
 
@@ -320,8 +327,44 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         String appName = Utils.getProperName(mElementUtils.getPackageOf(element).toString(), app.name());
         appCollection.collect(
                 new NodeApp()
-                        .setName(appName)
-                        .setLabel(app.label())
+                        .name(appName)
+                        .allowTaskReparenting(app.allowTaskReparenting().getResult())
+                        .allowBackup(app.allowBackup().getResult())
+                        .allowClearUserData(app.allowClearUserData().getResult())
+                        .backupAgent(app.backupAgent())
+                        .backupInForeground(app.backupInForeground().getResult())
+                        .banner(app.banner())
+                        .debuggable(app.debuggable().getResult())
+                        .description(app.description())
+                        .directBootAware(app.directBootAware().getResult())
+                        .enabled(app.enabled().getResult())
+                        .extractNativeLibs(app.extractNativeLibs().getResult())
+                        .fullBackupContent(app.fullBackupContent())
+                        .fullBackupOnly(app.fullBackupOnly().getResult())
+                        .hasCode(app.hasCode().getResult())
+                        .hardwareAccelerated(app.hardwareAccelerated().getResult())
+                        .icon(app.icon())
+                        .isGame(app.isGame().getResult())
+                        .killAfterRestore(app.killAfterRestore().getResult())
+                        .largeHeap(app.largeHeap().getResult())
+                        .label(app.label())
+                        .logo(app.logo())
+                        .manageSpaceActivity(app.manageSpaceActivity())
+                        .networkSecurityConfig(app.networkSecurityConfig())
+                        .permission(app.permission())
+                        .persistent(app.persistent().getResult())
+                        .process(app.process())
+                        .restoreAnyVersion(app.restoreAnyVersion().getResult())
+                        .requiredAccountType(app.requiredAccountType())
+                        .resizeableActivity(app.resizeableActivity().getResult())
+                        .restrictedAccountType(app.restrictedAccountType())
+                        .supportsRtl(app.supportsRtl().getResult())
+                        .taskAffinity(app.taskAffinity())
+                        .testOnly(app.testOnly().getResult())
+                        .theme(app.theme())
+                        .allowTaskReparenting(app.allowTaskReparenting().getResult())
+                        .usesCleartextTraffic(app.usesCleartextTraffic().getResult())
+                        .vmSafeMode(app.vmSafeMode().getResult())
         );
     }
 

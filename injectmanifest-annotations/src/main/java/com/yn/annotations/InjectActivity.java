@@ -1,6 +1,7 @@
 package com.yn.annotations;
 
 import com.yn.annotations.enums.Correct;
+import com.yn.annotations.enums.UiOptions;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -244,22 +245,6 @@ public @interface InjectActivity {
 
     //    android:uiOptions=["none"|"splitActionBarWhenNarrow"]
     UiOptions uiOptions() default UiOptions.NULL/*UiOptions.NONE*/;
-
-    enum UiOptions {
-        NULL(""),
-        NONE("none"),
-        SPLIT_ACTIONBAR_WHEN_NARROW("splitActionBarWhenNarrow");
-
-        private String uiOptions;
-
-        UiOptions(String uiOptions) {
-            this.uiOptions = uiOptions;
-        }
-
-        public String getUiOptions() {
-            return uiOptions;
-        }
-    }
 
     //    android:windowSoftInputMode=["stateUnspecified",
 //            "stateUnchanged","stateHidden",
