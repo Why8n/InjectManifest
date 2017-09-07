@@ -25,6 +25,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface InjectManifest {
+    String xmlns() default "http://schemas.android.com/apk/res/android";
+
     String pkName() default "";
 
     String sharedUserId() default "";

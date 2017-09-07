@@ -151,12 +151,13 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     private void parseManifest(AndroidManifest.ManifestCollection manifestCollection, InjectManifest manifest) {
         manifestCollection.collect(
                 new NodeManifest()
+                        .xmlns(manifest.xmlns())
                         .setPackage(manifest.pkName())
-                        .setSharedUserId(manifest.sharedUserId())
-                        .setSharedUserLabel(manifest.sharedUserLabel())
-                        .setVersionCode(manifest.versionCode())
-                        .setVersionName(manifest.versionName())
-                        .setInstallLocation(manifest.installLocation().getName())
+                        .sharedUserId(manifest.sharedUserId())
+                        .sharedUserLabel(manifest.sharedUserLabel())
+                        .versionCode(manifest.versionCode())
+                        .versionName(manifest.versionName())
+                        .installLocation(manifest.installLocation().getName())
         );
     }
 

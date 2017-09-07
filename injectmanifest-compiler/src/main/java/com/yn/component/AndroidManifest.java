@@ -104,6 +104,7 @@ public abstract class AndroidManifest<T> {
     public abstract String setQName();
 
     public static class ManifestCollection extends AndroidManifest<NodeManifest> {
+        public static final String KEY_ATTR_XMLNS = "xmlns:android";
         public static final String KEY_PACKAGE = "package";
         public static final String KEY_SHARED_USER_ID = "android:sharedUserId";
         public static final String KEY_SHARED_USER_LABEL = "android:sharedUserLabel";
