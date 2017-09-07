@@ -11,6 +11,7 @@ import com.yn.annotations.InjectReceiver;
 import com.yn.annotations.InjectService;
 import com.yn.component.AndroidManifest;
 import com.yn.component.Collections;
+import com.yn.component.ComponentBasic;
 import com.yn.component.NodeActivity;
 import com.yn.component.NodeApp;
 import com.yn.component.NodeManifest;
@@ -170,17 +171,17 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     private void parseReceiver(AndroidManifest.ReceiverCollection receiverCollection, InjectReceiver receiver, Element element) {
         String receiverName = Utils.getProperName(mElementUtils.getPackageOf(element).getQualifiedName().toString(),
                 receiver.name());
-        receiverCollection.collect(
-                new NodeReceiver(receiverName)
-                        .name(receiverName)
-                        .directBootAware(receiver.directBootAware().getResult())
-                        .enabled(receiver.enabled().getResult())
-                        .exported(receiver.exported().getResult())
-                        .icon(receiver.icon())
-                        .label(receiver.label())
-                        .permission(receiver.permission())
-                        .process(receiver.process())
-        );
+        NodeReceiver nodeReceiver = new NodeReceiver(receiverName)
+                .name(receiverName)
+                .directBootAware(receiver.directBootAware().getResult())
+                .enabled(receiver.enabled().getResult())
+                .exported(receiver.exported().getResult())
+                .icon(receiver.icon())
+                .label(receiver.label())
+                .permission(receiver.permission())
+                .process(receiver.process());
+        parseIntentFilter(nodeReceiver, receiver.intentFilter());
+        receiverCollection.collect(nodeReceiver);
     }
 
     private boolean parseService(RoundEnvironment roundEnvironment, Collections manifest) {
@@ -198,19 +199,19 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
 
     private void parseService(AndroidManifest.ServiceCollection serviceCollection, InjectService service, Element element) {
         String serviceName = Utils.getProperName(mElementUtils.getPackageOf(element).toString(), service.name());
-        serviceCollection.collect(
-                new NodeService(serviceName)
-                        .name(serviceName)
-                        .description(service.description())
-                        .directBootAware(service.directBootAware().getResult())
-                        .enabled(service.enabled().getResult())
-                        .exported(service.exported().getResult())
-                        .icon(service.icon())
-                        .isolatedProcess(service.isolatedProcess().getResult())
-                        .label(service.label())
-                        .permission(service.permission())
-                        .process(service.process())
-        );
+        NodeService nodeService = new NodeService(serviceName)
+                .name(serviceName)
+                .description(service.description())
+                .directBootAware(service.directBootAware().getResult())
+                .enabled(service.enabled().getResult())
+                .exported(service.exported().getResult())
+                .icon(service.icon())
+                .isolatedProcess(service.isolatedProcess().getResult())
+                .label(service.label())
+                .permission(service.permission())
+                .process(service.process());
+        parseIntentFilter(nodeService, service.intentFilter());
+        serviceCollection.collect(nodeService);
     }
 
     private boolean parseActivity(RoundEnvironment roundEnvironment, Collections manifest) {
@@ -266,19 +267,24 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 .theme(activity.theme())
                 .uiOptions(activity.uiOptions())
                 .windowSoftInputMode(activity.windowSoftInputMode());
-        InjectIntentFilter intentFilter = activity.intentFilter();
+        parseIntentFilter(nodeActivity, activity.intentFilter());
+        collections.collect(nodeActivity);
+    }
+
+    private <T extends ComponentBasic> void parseIntentFilter(T nodeComponent, InjectIntentFilter intentFilter) {
+        if (intentFilter == null)
+            return;
         String[] actions = intentFilter.action();
         for (int i = 0, length = actions.length; i < length; ++i) {
-            nodeActivity.addAction(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, actions[i]);
+            nodeComponent.addAction(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, actions[i]);
         }
         String[] categories = intentFilter.category();
         for (int i = 0, length = categories.length; i < length; ++i) {
-            nodeActivity.addCategory(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, categories[i]);
+            nodeComponent.addCategory(AndroidManifest.ActivityCollection.KEY_ATTR_NAME, categories[i]);
         }
         InjectData[] datas = intentFilter.data();
         for (int i = 0, length = datas.length; i < length; ++i) {
-
-            nodeActivity.addData(
+            nodeComponent.addData(
                     new DataAttribute()
                             .scheme(datas[i].scheme())
                             .host(datas[i].host())
@@ -289,7 +295,6 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                             .mimeType(datas[i].mimeType())
             );
         }
-        collections.collect(nodeActivity);
     }
 
     private boolean checkIsSingle(Set<? extends Element> annotationElements, Class<? extends Annotation> annotation) {

@@ -21,7 +21,7 @@ import java.util.List;
         name= "com.yn.injectmanifest.MainActivity",
         intentFilter = @InjectIntentFilter(
                 action = {"android.intent.action.MAIN", "android.intent.action_whyn_test"},
-                category = "android.intent.category.LAUNCHER"
+                category = {"android.intent.category.LAUNCHER","android.intent.category.whyn"}
         ))
 public class MainActivity extends AppCompatActivity {
     @InjectPermissions(Manifest.permission.SEND_SMS)

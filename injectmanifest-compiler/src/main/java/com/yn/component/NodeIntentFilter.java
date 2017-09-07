@@ -36,12 +36,14 @@ public class NodeIntentFilter {
     public void addCategory(Map<String, String> _category) {
         categories.addAttr(_category);
     }
-    public void addData(DataAttribute data)
-    {
+
+    public void addData(DataAttribute data) {
         datas.addData(data);
     }
 
     public boolean isEmpty() {
-        return actions.isEmpty() && categories.isEmpty();
+        return actions.isEmpty()
+                && categories.isEmpty()
+                && datas.isEmpty();
     }
 }
