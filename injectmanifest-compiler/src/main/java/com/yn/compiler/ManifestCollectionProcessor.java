@@ -93,6 +93,9 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+
+        if (roundEnvironment.processingOver())
+            return false;
         isNeedGenerateXml = false;
         final Collections androidManifest = preparedAndroidManifest();
         IXml xmlDecoder = null;
