@@ -12,8 +12,8 @@ import java.util.Set;
  */
 
 public class NodeProvider extends NodeApp {
-    Set<NodeGrantUriPermission> grantUriPermissions = new HashSet<>();
-    Set<NodePathPermission> pathPermissions = new HashSet<>();
+    final Set<NodeGrantUriPermission> grantUriPermissions = new HashSet<>();
+    final Set<NodePathPermission> pathPermissions = new HashSet<>();
     //    NodeMetaData metaDatas = new NodeMetaData();
 
 

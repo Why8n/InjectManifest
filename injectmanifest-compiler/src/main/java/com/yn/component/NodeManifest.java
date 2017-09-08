@@ -6,7 +6,7 @@ package com.yn.component;
 
 
 public class NodeManifest {
-    Attrs attrs = new Attrs();
+    final Attrs attrs = new Attrs();
 
     public NodeManifest xmlns(String xmlns) {
         attrs.addAttr(AndroidManifest.ManifestCollection.KEY_ATTR_XMLNS, xmlns);

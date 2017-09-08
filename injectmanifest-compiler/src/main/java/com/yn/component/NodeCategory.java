@@ -3,7 +3,6 @@ package com.yn.component;
 
 import com.yn.component.bean.Attribute;
 import com.yn.structure.KVSameList;
-import com.yn.utils.Utils;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,7 @@ import java.util.Map;
  */
 
 public class NodeCategory {
-    private List<Attribute> categories = new KVSameList<>();
+    private final List<Attribute> categories = new KVSameList<>();
 
     public void addAttr(String key, String value) {
         categories.add(new Attribute(key, value));

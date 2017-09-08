@@ -21,9 +21,9 @@ public class NodePathPermission extends NodeGrantUriPermission {
     private static final String KEY_ATTR_READ_PERMISSION = "android:readPermission";
     private static final String KEY_ATTR_WRITE_PERMISSION = "android:writePermission";
 
-    String permission;
-    String readPermission;
-    String writePermission;
+    private String permission;
+    private String readPermission;
+    private String writePermission;
 
     public NodePathPermission permission(String permission) {
         this.permission = permission;

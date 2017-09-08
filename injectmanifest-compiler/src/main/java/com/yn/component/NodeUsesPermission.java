@@ -15,7 +15,7 @@ import static com.yn.component.AndroidManifest.KEY_ATTR_NAME;
 public class NodeUsesPermission {
     private static final String KEY_ATTR_MAXSDKVERSION = "android:maxSdkVersion";
 
-    String permission;
+    private String permission;
     String maxSdkVersion;
 
     public NodeUsesPermission permission(String permission) {

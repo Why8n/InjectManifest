@@ -7,7 +7,7 @@ import java.util.HashSet;
  * Created by Whyn on 2017/9/6.
  */
 
-public class RidLastSet<T> extends HashSet<T> {
+public class UpdateSet<T> extends HashSet<T> {
     @Override
     public boolean add(T t) {
         if (this.contains(t))

@@ -31,7 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 
 public class SaxXml implements IXml {
 
-    private Collections mAndroidManifest;
+    private final Collections mAndroidManifest;
 
     public SaxXml(Collections manifest) {
         Utils.checkNotNull(manifest, String.format(Locale.getDefault(),
@@ -51,11 +51,6 @@ public class SaxXml implements IXml {
                 public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
                     super.startElement(uri, localName, qName, attributes);
                     mAndroidManifest.collect(uri, localName, qName, attributes);
-                }
-
-                @Override
-                public void endElement(String uri, String localName, String qName) throws SAXException {
-                    super.endElement(uri, localName, qName);
                 }
             });
         } catch (ParserConfigurationException e) {

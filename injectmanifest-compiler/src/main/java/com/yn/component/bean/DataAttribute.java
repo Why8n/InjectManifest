@@ -18,7 +18,7 @@ public class DataAttribute {
     private static final String QUALIFIED_NAME_PATHPREFIX = "android:pathPrefix";
     private static final String QUALIFIED_NAME_MIMETYPE = "android:mimeType";
 
-    private KVSameList<Attribute> data = new KVSameList<>();
+    private final KVSameList<Attribute> data = new KVSameList<>();
 
     private boolean check(Attribute att) {
         return att.value != null && !att.value.isEmpty();

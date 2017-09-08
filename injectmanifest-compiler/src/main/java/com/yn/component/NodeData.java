@@ -10,7 +10,7 @@ import java.util.Set;
  */
 
 public class NodeData {
-    private Set<DataAttribute> attrs = new HashSet<>();
+    private final Set<DataAttribute> attrs = new HashSet<>();
 
     public void addData(DataAttribute data) {
         attrs.add(data);

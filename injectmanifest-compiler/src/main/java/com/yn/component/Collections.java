@@ -17,9 +17,9 @@ import java.util.Set;
  */
 
 public class Collections {
-    private List<AndroidManifest<?>> components = new ArrayList<>();
-    private Map<Object, AndroidManifest<?>> tags = new HashMap<>();
-    private AndroidManifest<?> delegate = new AndroidManifest() {
+    private final List<AndroidManifest<?>> components = new ArrayList<>();
+    private final Map<Object, AndroidManifest<?>> tags = new HashMap<>();
+    private final AndroidManifest<Object> delegate = new AndroidManifest<Object>() {
         @Override
         public void write2File(INode nodeWriter) {
             for (AndroidManifest<?> compoent : components)
@@ -27,7 +27,7 @@ public class Collections {
         }
 
         @Override
-        public void collect(String uri, String localName, String qName, Set attributes) {
+        public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             for (AndroidManifest<?> compoent : components)
                 compoent.collect(uri, localName, qName, attributes);
         }
@@ -39,7 +39,7 @@ public class Collections {
 
     };
 
-    public <T> boolean plantComponent(AndroidManifest<T> component) {
+    public <A, B extends AndroidManifest<A>> boolean plantComponent(B component) {
         return components.add(component);
     }
 
@@ -47,7 +47,7 @@ public class Collections {
         return tags.get(tag);
     }
 
-    public <T> boolean plantComponent(AndroidManifest<T> component, Object tag) {
+    public <A, B extends AndroidManifest<A>> boolean plantComponent(B component, Object tag) {
         tags.put(tag, component);
         return components.add(component);
     }

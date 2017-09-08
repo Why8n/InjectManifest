@@ -14,9 +14,7 @@ public class KVSameList<T extends Attribute> extends LinkedList<T> {
     @Override
     public boolean add(T t) {
         T item = Utils.getSameItemFromCollection(this, t);
-        if (item != null && item.value.equals(t.value))
-            return false;
-        return super.add(t);
+        return !(item != null && item.value.equals(t.value)) && super.add(t);
     }
 
     @Override

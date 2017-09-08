@@ -17,7 +17,7 @@ import static com.yn.component.AndroidManifest.KEY_ATTR_NAME;
 public class NodeMetaData {
 
 
-    List<MetaData> metaDatas = new ArrayList<>();
+    final List<MetaData> metaDatas = new ArrayList<>();
 
     private boolean check(MetaData newMetaData) {
         if (metaDatas.contains(newMetaData)) {

@@ -1,7 +1,7 @@
 package com.yn.component;
 
 import com.yn.component.bean.Attribute;
-import com.yn.structure.RidLastSet;
+import com.yn.structure.UpdateSet;
 
 import java.util.Map;
 import java.util.Set;
@@ -10,8 +10,8 @@ import java.util.Set;
  * Created by Whyn on 2017/8/31.
  */
 
-public class Attrs {
-    private Set<Attribute> attrs = new RidLastSet<>();
+class Attrs {
+    private final Set<Attribute> attrs = new UpdateSet<>();
 
     private boolean check(final String value) {
         return value != null && !value.isEmpty();

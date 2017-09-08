@@ -14,8 +14,8 @@ import java.util.Set;
  * for activity,service,broadcast
  */
 public class ComponentBasic extends NodeBasic {
-    NodeIntentFilter intentFilter = new NodeIntentFilter();
-    NodeMetaData metaDatas = new NodeMetaData();
+    final NodeIntentFilter intentFilter = new NodeIntentFilter();
+    final NodeMetaData metaDatas = new NodeMetaData();
 
     public ComponentBasic(String name) {
         super(name);
@@ -29,11 +29,10 @@ public class ComponentBasic extends NodeBasic {
     }
 
 
-        public <T extends ComponentBasic> T addAttr(Set<Attribute> attributes) {
-            attrs.addAllAttr(attributes);
-            return (T) this;
-        }
-
+    public <T extends ComponentBasic> T addAttr(Set<Attribute> attributes) {
+        attrs.addAllAttr(attributes);
+        return (T) this;
+    }
 
 
     public ComponentBasic addAction(String key, String value) {

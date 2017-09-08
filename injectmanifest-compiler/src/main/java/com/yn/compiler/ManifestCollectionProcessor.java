@@ -131,7 +131,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         if (xmlDecoder == null)
             xmlDecoder = XmlFactory.createXmlDecoder(androidManifest);
 
-        return isNeedGenerateXml ? generatedXml(xmlDecoder) : false;
+        return isNeedGenerateXml && generatedXml(xmlDecoder);
 
     }
 
@@ -153,6 +153,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         if (!checkIsSingle(annotatedElements, InjectManifest.class))
             return false;
         AndroidManifest.ManifestCollection manifestCollection = (AndroidManifest.ManifestCollection) manifest.getTag(TAG_MANIFEST);
+        checkCollection(manifestCollection, AndroidManifest.ManifestCollection.class, TAG_MANIFEST);
         for (Element element : annotatedElements) {
             if (!isClass(element, InjectManifest.class))
                 return false;
@@ -180,6 +181,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     private boolean parseReceiver(RoundEnvironment roundEnvironment, Collections manifest) {
         AndroidManifest.ReceiverCollection receiverCollection =
                 (AndroidManifest.ReceiverCollection) manifest.getTag(TAG_RECEIVER);
+        checkCollection(receiverCollection, AndroidManifest.ReceiverCollection.class, TAG_RECEIVER);
         for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectReceiver.class)) {
             if (!isClass(element, InjectReceiver.class) || !isSubtypeOfType(element, TYPE_RECEIVER))
                 return false;
@@ -273,6 +275,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     private boolean parseService(RoundEnvironment roundEnvironment, Collections manifest) {
         AndroidManifest.ServiceCollection serviceCollection =
                 (AndroidManifest.ServiceCollection) manifest.getTag(TAG_SERVICE);
+        checkCollection(serviceCollection, AndroidManifest.ServiceCollection.class, TAG_SERVICE);
         for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectService.class)) {
             if (!isClass(element, InjectService.class) || !isSubtypeOfType(element, TYPE_SERVICE))
                 return false;
@@ -439,6 +442,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
             return false;
         AndroidManifest.ApplicationCollection appCollection =
                 (AndroidManifest.ApplicationCollection) manifest.getTag(TAG_APPLICATION);
+        checkCollection(appCollection, AndroidManifest.ApplicationCollection.class, TAG_APPLICATION);
         for (Element element : annotationElements) {
             if (!isClass(element, InjectApp.class) || !isSubtypeOfType(element, TYPE_APP))
                 return false;
@@ -497,7 +501,6 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         AndroidManifest.UsesPermissionCollection usesPermissionCollection =
                 (AndroidManifest.UsesPermissionCollection) manifest.getTag(TAG_PERMISSION);
         checkCollection(usesPermissionCollection, AndroidManifest.UsesPermissionCollection.class, TAG_PERMISSION);
-
         for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectUsesPermission.class)) {
             InjectUsesPermission permissions = element.getAnnotation(InjectUsesPermission.class);
             parsePermission(usesPermissionCollection, permissions);

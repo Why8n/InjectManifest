@@ -9,9 +9,9 @@ import java.util.Map;
  */
 
 public class NodeIntentFilter {
-    NodeAction actions = new NodeAction();
-    NodeCategory categories = new NodeCategory();
-    NodeData datas = new NodeData();
+    final NodeAction actions = new NodeAction();
+    final NodeCategory categories = new NodeCategory();
+    final NodeData datas = new NodeData();
 
     public void copy(NodeIntentFilter other) {
         if (other == null)

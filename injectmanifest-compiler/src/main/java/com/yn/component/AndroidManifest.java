@@ -121,7 +121,7 @@ public abstract class AndroidManifest<T> {
         static final String KEY_VERSION_NAME = "android:versionName";
         static final String KEY_INSTALL_LOCATION = "android:installLocation";
 
-        NodeManifest mManifest = new NodeManifest();
+        final NodeManifest mManifest = new NodeManifest();
 
         {
             mCollections.add(mManifest);
@@ -163,7 +163,7 @@ public abstract class AndroidManifest<T> {
     }
 
     public static class ApplicationCollection extends AndroidManifest<NodeApp> {
-        NodeApp mApp = new NodeApp(null);
+        final NodeApp mApp = new NodeApp(null);
 
         {
             mCollections.add(mApp);
@@ -263,14 +263,6 @@ public abstract class AndroidManifest<T> {
             }
         }
 
-        <V extends Attribute> String getNameFromSet(String targetName, Set<V> set) {
-            for (V item : set) {
-                if (item.key.equals(targetName))
-                    return item.value;
-            }
-            return null;
-        }
-
     }
 
     public static class ActivityCollection extends ComponentBasicCollection<NodeActivity> {
@@ -279,8 +271,8 @@ public abstract class AndroidManifest<T> {
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_ACTIVITY;
-                lastComponentName = getNameFromSet(KEY_ATTR_NAME, attributes);
-                lastComponentName = Utils.getProperName(sPackageName, lastComponentName);
+                lastComponentName = Utils.getProperName(sPackageName,
+                        Utils.getValueFromCollection(KEY_ATTR_NAME, attributes));
                 if (!attributes.isEmpty()) {
                     collect(new NodeActivity(lastComponentName).<NodeActivity>addAttr(attributes));
                 }
@@ -383,8 +375,8 @@ public abstract class AndroidManifest<T> {
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_SERVICE;
-                lastComponentName = getNameFromSet(KEY_ATTR_NAME, attributes);
-                lastComponentName = Utils.getProperName(sPackageName, lastComponentName);
+                lastComponentName = Utils.getProperName(sPackageName,
+                        Utils.getValueFromCollection(KEY_ATTR_NAME, attributes));
                 if (attributes != null && !attributes.isEmpty()) {
                     collect(new NodeService(lastComponentName).<NodeService>addAttr(attributes));
                 }
@@ -450,8 +442,8 @@ public abstract class AndroidManifest<T> {
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_RECEIVER;
-                lastComponentName = getNameFromSet(KEY_ATTR_NAME, attributes);
-                lastComponentName = Utils.getProperName(sPackageName, lastComponentName);
+                lastComponentName = Utils.getProperName(sPackageName,
+                        Utils.getValueFromCollection(KEY_ATTR_NAME, attributes));
                 if (attributes != null && !attributes.isEmpty()) {
                     collect(new NodeReceiver(lastComponentName).<NodeReceiver>addAttr(attributes));
                 }

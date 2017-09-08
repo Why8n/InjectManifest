@@ -2,7 +2,6 @@ package com.yn.component;
 
 import com.yn.component.bean.Attribute;
 import com.yn.structure.KVSameList;
-import com.yn.utils.Utils;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.Map;
  */
 
 public class NodeAction {
-    private List<Attribute> actions = new KVSameList<>();
+    private final List<Attribute> actions = new KVSameList<>();
 
     public void addAction(String key, String value) {
         actions.add(new Attribute(key, value));

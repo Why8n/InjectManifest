@@ -15,9 +15,9 @@ public class NodeGrantUriPermission {
     private static final String KEY_ATTR_PATH_PATTERN = "android:pathPattern";
     private static final String KEY_ATTR_PATH_PREFIX = "android:pathPrefix";
 
-    String path;
-    String pathPattern;
-    String pathPrefix;
+    private String path;
+    private String pathPattern;
+    private String pathPrefix;
 
     public <T extends NodeGrantUriPermission> T path(String path) {
         this.path = path;
