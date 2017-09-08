@@ -1,6 +1,7 @@
 package com.yn.component;
 
 import com.yn.component.bean.Attribute;
+import com.yn.utils.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +19,7 @@ public class NodeUsesPermission {
     String maxSdkVersion;
 
     public NodeUsesPermission permission(String permission) {
+        Utils.checkNotNull(permission, "permission must not be null");
         this.permission = permission;
         return this;
     }
@@ -45,11 +47,7 @@ public class NodeUsesPermission {
 
     @Override
     public int hashCode() {
-        int result = 17;
-        result *= 31 + permission.hashCode();
-        if (maxSdkVersion != null && !maxSdkVersion.isEmpty())
-            result *= 31 + maxSdkVersion.hashCode();
-        return result;
+        return permission.hashCode();
     }
 
     @Override
@@ -62,8 +60,6 @@ public class NodeUsesPermission {
                 break;
             NodeUsesPermission other = (NodeUsesPermission) o;
             bRet = this.permission.equals(other.permission);
-            if (bRet && maxSdkVersion != null && !maxSdkVersion.isEmpty())
-                bRet = this.maxSdkVersion.equals(other.maxSdkVersion);
         } while (false);
         return bRet;
     }
@@ -77,9 +73,9 @@ public class NodeUsesPermission {
 
     public Set<Attribute> asSet() {
         Set<Attribute> uses_permission = new HashSet<>();
-        if (permission != null && !permission.isEmpty())
+        if (!Utils.isEmpty(permission))
             uses_permission.add(new Attribute(KEY_ATTR_NAME, permission));
-        if (maxSdkVersion != null && !maxSdkVersion.isEmpty())
+        if (!Utils.isEmpty(maxSdkVersion))
             uses_permission.add(new Attribute(KEY_ATTR_MAXSDKVERSION, maxSdkVersion));
         return uses_permission;
     }

@@ -70,7 +70,7 @@ public final class Utils {
         checkNotNull(sMessager, "Messager is null,did you forget to call Utils.init()");
     }
 
-    public static  void checkNotNull(Object target, String errorMsg) {
+    public static void checkNotNull(Object target, String errorMsg) {
         if (target != null)
             return;
         throw new IllegalArgumentException(errorMsg);
@@ -165,9 +165,11 @@ public final class Utils {
     }
 
     public static <T> T getSameItemFromCollection(Collection<? extends T> collection, T newItem) {
-        for (T item : collection) {
-            if (item.equals(newItem))
-                return item;
+        if (collection != null && collection.contains(newItem)) {
+            for (T item : collection) {
+                if (item.equals(newItem))
+                    return item;
+            }
         }
         return null;
     }

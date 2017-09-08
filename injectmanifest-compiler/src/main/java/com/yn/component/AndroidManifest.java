@@ -6,7 +6,6 @@ import com.yn.component.bean.MetaData;
 import com.yn.utils.Utils;
 import com.yn.xmls.interfaces.INode;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -213,8 +212,14 @@ public abstract class AndroidManifest<T> {
         }
 
         @Override
-        public void collect(NodeUsesPermission item) {
-            mCollections.add(item);
+        public void collect(NodeUsesPermission newItem) {
+            NodeUsesPermission item = Utils.getSameItemFromCollection(mCollections, newItem);
+            if (item != null) {
+                item.maxSdkVersion = Utils.isEmpty(newItem.maxSdkVersion) ?
+                        item.maxSdkVersion : newItem.maxSdkVersion;
+                return;
+            }
+            mCollections.add(newItem);
         }
 
         @Override
@@ -270,7 +275,6 @@ public abstract class AndroidManifest<T> {
 
         @Override
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
-            Utils.note("origin activity attr: " + Arrays.toString(attributes.toArray(new Attribute[attributes.size()])));
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_ACTIVITY;
                 String activityName = getNameFromSet(KEY_ATTR_NAME, attributes);
