@@ -24,6 +24,21 @@
                 android:name="haha"
                 android:value="activity haha" />
         </activity>
+        <provider
+            android:name=".providers.FirstProvider"
+            android:authorities="com.whyn.provider">
+            <grant-uri-permission
+                android:path="D:/"
+                android:pathPattern="E:/"
+                android:pathPrefix="yn" />
+            <path-permission
+                android:path="string"
+                android:pathPattern="string"
+                android:pathPrefix="string"
+                android:permission="string"
+                android:readPermission="string"
+                android:writePermission="string" />
+        </provider>
     </application>
 
 </manifest>

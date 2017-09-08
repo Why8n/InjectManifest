@@ -29,10 +29,11 @@ public class ComponentBasic extends NodeBasic {
     }
 
 
-    public ComponentBasic addAttr(Set<Attribute> attributes) {
-        attrs.addAllAttr(attributes);
-        return this;
-    }
+        public <T extends ComponentBasic> T addAttr(Set<Attribute> attributes) {
+            attrs.addAllAttr(attributes);
+            return (T) this;
+        }
+
 
 
     public ComponentBasic addAction(String key, String value) {

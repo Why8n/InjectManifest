@@ -9,6 +9,8 @@ import com.yn.xmls.interfaces.INode;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.yn.utils.Utils.getSameItemFromCollection;
+
 /**
  * Created by Whyn on 2017/8/30.
  */
@@ -18,12 +20,15 @@ public abstract class AndroidManifest<T> {
     private static final String QUALIFIED_NAME_APPLICATION = "application";
     private static final String QUALIFIED_NAME_ACTIVITY = "activity";
     private static final String QUALIFIED_NAME_SERVICE = "service";
+    private static final String QUALIFIED_NAME_PROVIDER = "provider";
     private static final String QUALIFIED_NAME_USESPERMISSION = "uses-permission";
     private static final String QUALIFIED_NAME_INTENTFILTER = "intent-filter";
     private static final String QUALIFIED_NAME_ACTION = "action";
     private static final String QUALIFIED_NAME_CATEGORY = "category";
     private static final String QUALIFIED_NAME_DATA = "data";
     private static final String QUALIFIED_NAME_METADATA = "meta-data";
+    private static final String QUALIFIED_NAME_GRADT_URI_PERMISSION = "grant-uri-permission";
+    private static final String QUALIFIED_NAME_PATH_PERMISSION = "path-permission";
 
 
     public static final String DOT = ".";
@@ -37,6 +42,7 @@ public abstract class AndroidManifest<T> {
     private static final int ACTION_ACTIVITY = 0x02;
     private static final int ACTION_SERVICE = 0x03;
     private static final int ACTION_RECEIVER = 0x04;
+    private static final int ACTION_PROVIDER = 0x04;
 //    private static final int ACTION_INTENTFILTER = 0x05;
 //    private static final int ACTION_ACTION = 0x06;
 //    private static final int ACTION_CATEGORY = 0x07;
@@ -44,15 +50,14 @@ public abstract class AndroidManifest<T> {
     static int lastAction = ACTION_NONE;
 
     static String sPackageName;
+
+    String lastComponentName;
+    boolean isLastElement = false;
     final String mQualifiedName;
     final Set<T> mCollections = new HashSet<>();
 
     {
         mQualifiedName = setQName();
-    }
-
-    public final String getQName() {
-        return mQualifiedName;
     }
 
     public void collect(T item) {
@@ -61,6 +66,11 @@ public abstract class AndroidManifest<T> {
         mCollections.add(item);
     }
 
+
+    public <V extends AndroidManifest<T>> V isLastElement(boolean lastElement) {
+        isLastElement = lastElement;
+        return (V) this;
+    }
 
     public boolean isEmpty() {
         return mCollections.isEmpty();
@@ -96,10 +106,9 @@ public abstract class AndroidManifest<T> {
         }
     }
 
+    public abstract void collect(String uri, String localName, String qName, Set<Attribute> attributes);
 
     public abstract void write2File(INode nodeWriter);
-
-    public abstract void collect(String uri, String localName, String qName, Set<Attribute> attributes);
 
     public abstract String setQName();
 
@@ -154,7 +163,7 @@ public abstract class AndroidManifest<T> {
     }
 
     public static class ApplicationCollection extends AndroidManifest<NodeApp> {
-        NodeApp mApp = new NodeApp();
+        NodeApp mApp = new NodeApp(null);
 
         {
             mCollections.add(mApp);
@@ -213,7 +222,7 @@ public abstract class AndroidManifest<T> {
 
         @Override
         public void collect(NodeUsesPermission newItem) {
-            NodeUsesPermission item = Utils.getSameItemFromCollection(mCollections, newItem);
+            NodeUsesPermission item = getSameItemFromCollection(mCollections, newItem);
             if (item != null) {
                 item.maxSdkVersion = Utils.isEmpty(newItem.maxSdkVersion) ?
                         item.maxSdkVersion : newItem.maxSdkVersion;
@@ -236,9 +245,6 @@ public abstract class AndroidManifest<T> {
     }
 
     private abstract static class ComponentBasicCollection<T extends ComponentBasic> extends AndroidManifest<T> {
-
-        String lastComponentName;
-        boolean isLastElement = false;
 
         @Override
         public void collect(T item) {
@@ -265,10 +271,6 @@ public abstract class AndroidManifest<T> {
             return null;
         }
 
-        public ComponentBasicCollection<T> isLastElement(boolean lastElement) {
-            isLastElement = lastElement;
-            return this;
-        }
     }
 
     public static class ActivityCollection extends ComponentBasicCollection<NodeActivity> {
@@ -277,10 +279,10 @@ public abstract class AndroidManifest<T> {
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_ACTIVITY;
-                String activityName = getNameFromSet(KEY_ATTR_NAME, attributes);
-                activityName = Utils.getProperName(sPackageName, activityName);
+                lastComponentName = getNameFromSet(KEY_ATTR_NAME, attributes);
+                lastComponentName = Utils.getProperName(sPackageName, lastComponentName);
                 if (!attributes.isEmpty()) {
-                    collect((NodeActivity) new NodeActivity(lastComponentName = activityName).addAttr(attributes));
+                    collect(new NodeActivity(lastComponentName).<NodeActivity>addAttr(attributes));
                 }
                 return;
             }
@@ -381,10 +383,10 @@ public abstract class AndroidManifest<T> {
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_SERVICE;
-                String serviceName = getNameFromSet(KEY_ATTR_NAME, attributes);
-                serviceName = Utils.getProperName(sPackageName, serviceName);
+                lastComponentName = getNameFromSet(KEY_ATTR_NAME, attributes);
+                lastComponentName = Utils.getProperName(sPackageName, lastComponentName);
                 if (attributes != null && !attributes.isEmpty()) {
-                    collect((NodeService) new NodeService(lastComponentName = serviceName).addAttr(attributes));
+                    collect(new NodeService(lastComponentName).<NodeService>addAttr(attributes));
                 }
                 return;
             }
@@ -448,10 +450,10 @@ public abstract class AndroidManifest<T> {
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_RECEIVER;
-                String receiverName = getNameFromSet(KEY_ATTR_NAME, attributes);
-                receiverName = Utils.getProperName(sPackageName, receiverName);
+                lastComponentName = getNameFromSet(KEY_ATTR_NAME, attributes);
+                lastComponentName = Utils.getProperName(sPackageName, lastComponentName);
                 if (attributes != null && !attributes.isEmpty()) {
-                    collect((NodeReceiver) new NodeReceiver(lastComponentName = receiverName).addAttr(attributes));
+                    collect(new NodeReceiver(lastComponentName).<NodeReceiver>addAttr(attributes));
                 }
                 return;
             }
@@ -473,6 +475,85 @@ public abstract class AndroidManifest<T> {
         @Override
         public String setQName() {
             return QUALIFIED_NAME_RECEIVER;
+        }
+    }
+
+    public static class ProviderCollection extends AndroidManifest<NodeProvider> {
+
+        @Override
+        public void collect(NodeProvider item) {
+            if (mCollections.contains(item)) {
+                update(item);
+                return;
+            }
+            mCollections.add(item);
+        }
+
+        private void update(final NodeProvider newItem) {
+            NodeProvider item = Utils.getSameItemFromCollection(mCollections, newItem);
+            if (item != null)
+                item.copy(newItem);
+        }
+
+        @Override
+        public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
+            if (qName.equals(mQualifiedName)) {
+                lastAction = ACTION_PROVIDER;
+                if (!attributes.isEmpty()) {
+                    lastComponentName = Utils.getValueFromCollection(KEY_ATTR_NAME, attributes);
+                    lastComponentName = Utils.getProperName(sPackageName, lastComponentName);
+                    collect(new NodeProvider(lastComponentName).addAttr(attributes));
+                }
+                return;
+            }
+            if (lastAction != ACTION_PROVIDER)
+                return;
+            if (attributes.isEmpty())
+                return;
+            if (QUALIFIED_NAME_GRADT_URI_PERMISSION.equals(qName)) {
+                collect(new NodeProvider(lastComponentName).addGrantUriPermission(attributes));
+            } else if (QUALIFIED_NAME_PATH_PERMISSION.equals(qName)) {
+                collect(new NodeProvider(lastComponentName).addPathPermissions(attributes));
+            }
+
+        }
+
+        @Override
+        public void write2File(INode nodeWriter) {
+            try {
+                for (NodeProvider provider : mCollections) {
+                    nodeWriter.startTag(mQualifiedName, provider.attrs.all());
+                    writeGrantUriPermission2File(nodeWriter, provider.grantUriPermissions);
+                    writeMetaData2File(nodeWriter, provider.metaDatas);
+                    writePathPermission2File(nodeWriter, provider.pathPermissions);
+                    nodeWriter.endTag(mQualifiedName);
+                }
+                if (isLastElement) {
+                    nodeWriter.endTag(QUALIFIED_NAME_APPLICATION);
+                    nodeWriter.endTag(QUALIFIED_NAME_MANIFEST);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void writePathPermission2File(INode nodeWriter, Set<NodePathPermission> pathPermissions) throws Exception {
+            for (NodePathPermission pathPermission : pathPermissions) {
+                nodeWriter.startTag(QUALIFIED_NAME_PATH_PERMISSION, pathPermission.asSet());
+                nodeWriter.endTag(QUALIFIED_NAME_PATH_PERMISSION);
+            }
+        }
+
+        private void writeGrantUriPermission2File(INode nodeWriter, Set<NodeGrantUriPermission> grantUriPermissions) throws Exception {
+            for (NodeGrantUriPermission grantUriPermission : grantUriPermissions) {
+                nodeWriter.startTag(QUALIFIED_NAME_GRADT_URI_PERMISSION, grantUriPermission.asSet());
+                nodeWriter.endTag(QUALIFIED_NAME_GRADT_URI_PERMISSION);
+            }
+        }
+
+        @Override
+        public String setQName() {
+            return QUALIFIED_NAME_PROVIDER;
         }
     }
 

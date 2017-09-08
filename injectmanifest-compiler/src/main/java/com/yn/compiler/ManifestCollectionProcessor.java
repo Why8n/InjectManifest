@@ -4,9 +4,12 @@ import com.google.auto.service.AutoService;
 import com.yn.annotations.InjectActivity;
 import com.yn.annotations.InjectApp;
 import com.yn.annotations.InjectData;
+import com.yn.annotations.InjectGrantUriPermission;
 import com.yn.annotations.InjectIntentFilter;
 import com.yn.annotations.InjectManifest;
 import com.yn.annotations.InjectMetaData;
+import com.yn.annotations.InjectPathPermission;
+import com.yn.annotations.InjectProvider;
 import com.yn.annotations.InjectReceiver;
 import com.yn.annotations.InjectService;
 import com.yn.annotations.InjectUsesPermission;
@@ -16,7 +19,10 @@ import com.yn.component.Collections;
 import com.yn.component.ComponentBasic;
 import com.yn.component.NodeActivity;
 import com.yn.component.NodeApp;
+import com.yn.component.NodeGrantUriPermission;
 import com.yn.component.NodeManifest;
+import com.yn.component.NodePathPermission;
+import com.yn.component.NodeProvider;
 import com.yn.component.NodeReceiver;
 import com.yn.component.NodeService;
 import com.yn.component.NodeUsesPermission;
@@ -43,13 +49,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.StandardLocation;
 
-import static com.yn.define.ConstValue.TAG_ACTIVITY;
-import static com.yn.define.ConstValue.TAG_APPLICATION;
-import static com.yn.define.ConstValue.TAG_MANIFEST;
-import static com.yn.define.ConstValue.TAG_PERMISSION;
-import static com.yn.define.ConstValue.TAG_RECEIVER;
-import static com.yn.define.ConstValue.TAG_SERVICE;
-
 @AutoService(Processor.class)
 public class ManifestCollectionProcessor extends AbstractProcessor {
     private static final String ANDROID_MANIFEST_XML = "AndroidManifest.xml";
@@ -59,6 +58,15 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     private static final String TYPE_ACTIVITY = "android.app.Activity";
     private static final String TYPE_SERVICE = "android.app.Service";
     private static final String TYPE_RECEIVER = "android.content.BroadcastReceiver";
+    private static final String TYPE_PROVIDER = "android.content.ContentProvider";
+
+    private static final String TAG_MANIFEST = "tag_manifest";
+    private static final String TAG_APPLICATION = "tag_application";
+    private static final String TAG_PERMISSION = "tag_permission";
+    private static final String TAG_ACTIVITY = "tag_activity";
+    private static final String TAG_SERVICE = "tag_service";
+    private static final String TAG_RECEIVER = "tag_receiver";
+    private static final String TAG_PROVIDER = "tag_provider";
 
     private Elements mElementUtils;
     private boolean isNeedGenerateXml;
@@ -117,6 +125,8 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
             return false;
         if (!parseReceiver(roundEnvironment, androidManifest))
             return false;
+        if (!parseProvider(roundEnvironment, androidManifest))
+            return false;
         parsePermission(roundEnvironment, androidManifest);
         if (xmlDecoder == null)
             xmlDecoder = XmlFactory.createXmlDecoder(androidManifest);
@@ -125,6 +135,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
 
     }
 
+
     private Collections preparedAndroidManifest() {
         Collections manifest = new Collections();
         manifest.plantComponent(new AndroidManifest.ManifestCollection(), TAG_MANIFEST);
@@ -132,6 +143,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         manifest.plantComponent(new AndroidManifest.ApplicationCollection(), TAG_APPLICATION);
         manifest.plantComponent(new AndroidManifest.ActivityCollection(), TAG_ACTIVITY);
         manifest.plantComponent(new AndroidManifest.ServiceCollection(), TAG_SERVICE);
+        manifest.plantComponent(new AndroidManifest.ProviderCollection(), TAG_PROVIDER);
         manifest.plantComponent(new AndroidManifest.ReceiverCollection().isLastElement(true), TAG_RECEIVER);
         return manifest;
     }
@@ -194,6 +206,69 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         parseMetaData(nodeReceiver, receiver.metaData());
         receiverCollection.collect(nodeReceiver);
     }
+
+    private boolean parseProvider(RoundEnvironment roundEnvironment, Collections manifest) {
+        AndroidManifest.ProviderCollection providerCollection =
+                (AndroidManifest.ProviderCollection) manifest.getTag(TAG_PROVIDER);
+        checkCollection(providerCollection, AndroidManifest.ProviderCollection.class, TAG_PROVIDER);
+        for (Element element : roundEnvironment.getElementsAnnotatedWith(InjectProvider.class)) {
+            if (!isClass(element, InjectProvider.class) || !isSubtypeOfType(element, TYPE_PROVIDER))
+                return false;
+            isNeedGenerateXml = true;
+            InjectProvider provider = element.getAnnotation(InjectProvider.class);
+            parseProvider(providerCollection, provider, element);
+        }
+        return true;
+    }
+
+    private void parseProvider(AndroidManifest.ProviderCollection collection, InjectProvider provider, Element element) {
+        String providerName = Utils.getProperName(mElementUtils.getPackageOf(element).toString(), provider.name());
+        NodeProvider nodeProvider = new NodeProvider(providerName)
+                .name(providerName)
+                .authorities(provider.authorities())
+                .directBootAware(provider.directBootAware().getResult())
+                .enabled(provider.enabled().getResult())
+                .exported(provider.exported().getResult())
+                .grantUriPermissions(provider.grantUriPermissions().getResult())
+                .icon(provider.icon())
+                .initOrder(provider.initOrder())
+                .label(provider.label())
+                .multiprocess(provider.multiprocess().getResult())
+                .permission(provider.permission())
+                .process(provider.process())
+                .readPermission(provider.readPermission())
+                .syncable(provider.syncable().getResult());
+        parseMetaData(nodeProvider, provider.metaData());
+        parseGrantUriPermission(nodeProvider, provider.grantUriPermission());
+        parsePathPermission(nodeProvider, provider.pathPermission());
+        collection.collect(nodeProvider);
+    }
+
+    private void parsePathPermission(NodeProvider nodeProvider, InjectPathPermission[] injectPathPermissions) {
+        for (int i = 0, lenth = injectPathPermissions.length; i < lenth; ++i) {
+            nodeProvider.addPathPermissions(
+                    new NodePathPermission()
+                            .<NodePathPermission>path(injectPathPermissions[i].path())
+                            .<NodePathPermission>pathPrefix(injectPathPermissions[i].pathPrefix())
+                            .<NodePathPermission>pathPattern(injectPathPermissions[i].pathPattern())
+                            .permission(injectPathPermissions[i].permission())
+                            .readPermission(injectPathPermissions[i].readPermission())
+                            .writePermission(injectPathPermissions[i].writePermission())
+            );
+        }
+    }
+
+    private void parseGrantUriPermission(NodeProvider nodeProvider, InjectGrantUriPermission[] injectGrantUriPermissions) {
+        for (int i = 0, lenth = injectGrantUriPermissions.length; i < lenth; ++i) {
+            nodeProvider.addGrantUriPermission(
+                    new NodeGrantUriPermission()
+                            .path(injectGrantUriPermissions[i].path())
+                            .pathPattern(injectGrantUriPermissions[i].pathPattern())
+                            .pathPrefix(injectGrantUriPermissions[i].pathPrefix())
+            );
+        }
+    }
+
 
     private boolean parseService(RoundEnvironment roundEnvironment, Collections manifest) {
         AndroidManifest.ServiceCollection serviceCollection =
@@ -300,7 +375,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
         }
     }
 
-    private void parseMetaData(NodeApp nodeComponent, InjectMetaData[] injectMetaDatas) {
+    private <T extends NodeApp> void parseMetaData(T nodeComponent, InjectMetaData[] injectMetaDatas) {
         String name = null;
         for (InjectMetaData metaData : injectMetaDatas) {
             name = metaData.name();
@@ -375,7 +450,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
 
     private void parseApp(AndroidManifest.ApplicationCollection appCollection, InjectApp app, Element element) {
         String appName = Utils.getProperName(mElementUtils.getPackageOf(element).toString(), app.name());
-        NodeApp nodeApp = new NodeApp()
+        NodeApp nodeApp = new NodeApp(appName)
                 .name(appName)
                 .allowTaskReparenting(app.allowTaskReparenting().getResult())
                 .allowBackup(app.allowBackup().getResult())
@@ -455,7 +530,7 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     private boolean isSubtypeOfType(final Element element, final String desireType) {
         boolean isSubType;
         if (!(isSubType = Utils.isSubtypeOfType(element.asType(), desireType))) {
-            Utils.warn("%s must extend from $s", element.getSimpleName(), desireType);
+            Utils.warn("%s must extends from $s", element.getSimpleName(), desireType);
         }
         return isSubType;
     }

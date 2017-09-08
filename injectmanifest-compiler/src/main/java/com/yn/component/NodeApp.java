@@ -10,17 +10,20 @@ import java.util.Set;
  * Created by Whyn on 2017/9/6.
  */
 
-public class NodeApp {
+public class NodeApp extends NodeBasic {
     final Attrs attrs = new Attrs();
     final NodeMetaData metaDatas = new NodeMetaData();
 
+    public NodeApp(String name) {
+        super(name);
+    }
 
     public NodeApp addAllAttr(Set<Attribute> attributes) {
         this.attrs.addAllAttr(attributes);
         return this;
     }
 
-    public void copy(NodeApp newItem) {
+    public <T extends NodeApp> void copy(T newItem) {
         this.attrs.addAllAttr(newItem.attrs.all());
         this.metaDatas.addAll(newItem.metaDatas);
     }
@@ -257,6 +260,7 @@ public class NodeApp {
         metaDatas.addMetaData(metaData);
         return this;
     }
+
     public NodeApp addMetaData(Set<Attribute> metaDataAttrs) {
         metaDatas.addMetaData(metaDataAttrs);
         return this;
