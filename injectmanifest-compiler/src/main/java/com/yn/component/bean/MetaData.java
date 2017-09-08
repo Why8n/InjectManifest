@@ -13,13 +13,14 @@ import static com.yn.component.AndroidManifest.KEY_ATTR_NAME;
 
 public class MetaData {
     public static final String KEY_ATTR_RESOURCE = "android:resource";
-    public static final String KEY_ATTR_VALUE = "android:resource";
+    public static final String KEY_ATTR_VALUE = "android:value";
 
     private String name;
     private String resource;
     private String value;
 
     public MetaData name(String name) {
+        Utils.checkNotNull(name,"meta-data'name must not be null");
         this.name = name;
         return this;
     }

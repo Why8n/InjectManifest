@@ -285,9 +285,15 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     }
 
     private <T extends ComponentBasic> void parseMetaData(T nodeComponent, InjectMetaData[] injectMetaDatas) {
+        String name = null;
         for (InjectMetaData metaData : injectMetaDatas) {
+            name = metaData.name();
+            if (Utils.isEmpty(name)) {
+                Utils.warn("meta-data without a name will be ignored");
+                continue;
+            }
             nodeComponent.addMetaData(new MetaData()
-                    .name(metaData.name())
+                    .name(name)
                     .resource(metaData.resource())
                     .value(metaData.value())
             );
@@ -295,9 +301,15 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     }
 
     private void parseMetaData(NodeApp nodeComponent, InjectMetaData[] injectMetaDatas) {
+        String name = null;
         for (InjectMetaData metaData : injectMetaDatas) {
+            name = metaData.name();
+            if (Utils.isEmpty(name)) {
+                Utils.warn("meta-data without a name will be ignored");
+                continue;
+            }
             nodeComponent.addMetaData(new MetaData()
-                    .name(metaData.name())
+                    .name(name)
                     .resource(metaData.resource())
                     .value(metaData.value())
             );

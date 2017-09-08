@@ -9,10 +9,8 @@ import android.view.View;
 import com.yn.annotations.InjectActivity;
 import com.yn.annotations.InjectData;
 import com.yn.annotations.InjectIntentFilter;
+import com.yn.annotations.InjectMetaData;
 import com.yn.annotations.InjectUsesPermission;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @InjectUsesPermission({
         Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -24,12 +22,18 @@ import java.util.List;
                 action = {"android.intent.action.MAIN", "android.intent.action_whyn_test"},
                 category = {"android.intent.category.LAUNCHER", "android.intent.category.whyn"},
                 data = @InjectData(mimeType = "image/*")
-        ))
+        ),
+        metaData = @InjectMetaData(name = "haha",resource = "123456")
+)
 public class MainActivity extends AppCompatActivity {
     @InjectUsesPermission(Manifest.permission.SEND_SMS)
     String field1;
 
-    @InjectUsesPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    @InjectUsesPermission({
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.ACCESS_WIFI_STATE,
+    })
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,23 +43,6 @@ public class MainActivity extends AppCompatActivity {
     @InjectUsesPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     public void onStartActivity(View view) {
         startActivity(new Intent(this, SecondActivity.class));
-        test(new Son());
-    }
-
-
-    public <T extends Dad> void test(T item) {
-        List<T> list = new ArrayList<>();
-//        list.add(new Son());
-        list.add(item);
-    }
-
-
-    private static class Dad {
-
-    }
-
-    private static class Son extends Dad {
-
     }
 }
 

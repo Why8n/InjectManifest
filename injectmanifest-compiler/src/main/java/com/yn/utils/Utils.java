@@ -70,17 +70,18 @@ public final class Utils {
         checkNotNull(sMessager, "Messager is null,did you forget to call Utils.init()");
     }
 
-    public static <T> void checkNotNull(T target, String errorMsg) {
+    public static  void checkNotNull(Object target, String errorMsg) {
         if (target != null)
             return;
         throw new IllegalArgumentException(errorMsg);
     }
 
-    public static <T> void checkNotNull(T target, String format, Object... args) {
+    public static void checkNotNull(Object target, String format, Object... args) {
         if (target != null)
             return;
         throw new IllegalArgumentException(String.format(format, args));
     }
+
 
     public static void close(Writer writer) {
         try {

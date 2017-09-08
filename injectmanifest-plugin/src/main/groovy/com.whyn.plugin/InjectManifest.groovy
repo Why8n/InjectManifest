@@ -5,25 +5,18 @@ import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
 
 class InjectManifest implements Plugin<Project> {
+    private static final String SAVED_ANDROID_MANIFEST = "AndroidManifest_old.xml"
 
     void apply(Project project) {
         dependencies(project);
-        project.extensions.create('manifestPath', ManifestConfigExt, project)
+        project.extensions.create('manifestConfig', ManifestConfigExt, project)
 
         project.afterEvaluate {
-            Map<String, String> arguments = new HashMap<String, String>()
-//            arguments.put("AndroidManifestPath", project.android.sourceSets.main.manifest.srcFile.absolutePath)
-            arguments.put("AndroidManifestPath",project.manifestPath.originManifestPath);
-            project.android.defaultConfig.javaCompileOptions.annotationProcessorOptions.arguments = arguments
-            print "path============="
-            println "${project.android.defaultConfig.javaCompileOptions.annotationProcessorOptions.arguments["AndroidManifestPath"]}"
+            def variants = determineVariants(project)
 
-//            def variants = determineVariants(project)
-//
-//            project.android[variants].all { variant ->
-//                configureVariant(project, variant)
-//            }
-
+            project.android[variants].all { variant ->
+                configureVariant(project, variant)
+            }
 
         }
     }
@@ -42,16 +35,16 @@ class InjectManifest implements Plugin<Project> {
     private static void configureVariant(Project project, def variant) {
         def javaCompile = variant.hasProperty('javaCompiler') ? variant.javaCompiler : variant.javaCompile
         javaCompile.doLast {
-            println "detected: originManifestPath:${project.manifestPath.originManifestPath}"
-            println "detected: genManifestPath:${project.manifestPath.genManifestPath}"
+            println "detected: originManifestPath:${project.manifestConfig.originManifestPath}"
+            println "detected: genManifestPath:${project.manifestConfig.genManifestPath}"
+            println "detected: saveOrigin:${project.manifestConfig.saveOrigin}"
 
-            def genManifest = new File(project.manifestPath.genManifestPath)
-            def originManifest = new File(project.manifestPath.originManifestPath);
+            def genManifest = new File(project.manifestConfig.genManifestPath)
+            def originManifest = new File(project.manifestConfig.originManifestPath);
             if (genManifest.exists()) {
-                if (originManifest.exists())
-                    originManifest.delete()
+                check(originManifest, project.manifestConfig.saveOrigin)
+                deleteOriginal(originManifest)
                 if (genManifest.renameTo(originManifest)) {
-                    // Success!!1 Files moved.
                     println 'Inject AndroidManifest successfully.'
                 } else {
                     println 'Inject AndriodManifest failed.'
@@ -59,6 +52,26 @@ class InjectManifest implements Plugin<Project> {
             }
         }
     }
+
+    private static void check(File originManifest, boolean saved) {
+        String parentDir = originManifest.getParent();
+        if (parentDir == null)
+            return;
+        File savedFile = new File(parentDir, SAVED_ANDROID_MANIFEST)
+        if (saved && !savedFile.exists()) {
+            if (originManifest.renameTo(savedFile)) {
+                println "original $originManifest.name has been saved as $SAVED_ANDROID_MANIFEST"
+            } else {
+                println "failed to saved original $originManifest.name"
+            }
+        }
+    }
+
+    private static void deleteOriginal(File originManifest) {
+        if (originManifest.exists())
+            originManifest.delete()
+    }
+
 
     private static void dependencies(Project project) {
         project.dependencies {
@@ -71,10 +84,13 @@ class InjectManifest implements Plugin<Project> {
 class ManifestConfigExt {
     def String originManifestPath
     def String genManifestPath
+    def boolean saveOrigin
 
     ManifestConfigExt(Project project) {
-        originManifestPath = "$project.projectDir/src/main/AndroidManifest.xml"
+//        originManifestPath = "$project.projectDir/src/main/AndroidManifest.xml"
+        originManifestPath = project.android.sourceSets.main.manifest.srcFile.absolutePath
         genManifestPath = "$project.buildDir/generated/source/apt/debug/AndroidManifest.xml"
+        saveOrigin = true
     }
 
 }

@@ -2,9 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yn.injectmanifest">
 
-    <uses-permission
-        android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="15" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -21,10 +19,10 @@
                 <data
                     android:mimeType="video/mp4"
                     android:scheme="https" />
-                <meta-data
-                    android:name="zoo"
-                    android:value="@string/app_name" />
             </intent-filter>
+            <meta-data
+                android:name="haha"
+                android:value="activity haha" />
         </activity>
     </application>
 

@@ -40,22 +40,30 @@ public class NodeMetaData {
             metaDatas.add(newMetaData);
     }
 
-    public void addMetaData(Attribute metaDataAttr) {
-        MetaData metaData = new MetaData();
-        if (KEY_ATTR_NAME.equals(metaDataAttr.key)) {
-            metaData.name(metaDataAttr.value);
-        } else if (MetaData.KEY_ATTR_RESOURCE.equals(metaDataAttr.key)) {
-            metaData.resource(metaDataAttr.value);
-        } else if (MetaData.KEY_ATTR_VALUE.equals(metaDataAttr.key)) {
-            metaData.value(metaDataAttr.value);
-        }
-        addMetaData(metaData);
-    }
+//    public void addMetaData(Attribute metaDataAttr) {
+//        MetaData metaData = new MetaData();
+//        if (KEY_ATTR_NAME.equals(metaDataAttr.key)) {
+//            metaData.name(metaDataAttr.value);
+//        } else if (MetaData.KEY_ATTR_RESOURCE.equals(metaDataAttr.key)) {
+//            metaData.resource(metaDataAttr.value);
+//        } else if (MetaData.KEY_ATTR_VALUE.equals(metaDataAttr.key)) {
+//            metaData.value(metaDataAttr.value);
+//        }
+//        addMetaData(metaData);
+//    }
 
     public void addMetaData(Set<Attribute> metaDataAttrs) {
+        MetaData metaData = new MetaData();
         for (Attribute attribute : metaDataAttrs) {
-            addMetaData(attribute);
+            if (KEY_ATTR_NAME.equals(attribute.key)) {
+                metaData.name(attribute.value);
+            } else if (MetaData.KEY_ATTR_RESOURCE.equals(attribute.key)) {
+                metaData.resource(attribute.value);
+            } else if (MetaData.KEY_ATTR_VALUE.equals(attribute.key)) {
+                metaData.value(attribute.value);
+            }
         }
+        addMetaData(metaData);
     }
 
 
@@ -65,7 +73,7 @@ public class NodeMetaData {
         }
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return metaDatas.isEmpty();
     }
 

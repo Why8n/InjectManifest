@@ -33,7 +33,10 @@ import static com.yn.annotations.enums.Correct.TRUE;
                         scheme = "file"
                 )
         ),
-        metaData = @InjectMetaData(name = "com.yn.meta-data.service")
+        metaData = @InjectMetaData(
+                name = "com.yn.meta-data.service",
+                resource = "@mipmap/ic_launcher_round"
+        )
 )
 public class FirstService extends Service {
     @Nullable

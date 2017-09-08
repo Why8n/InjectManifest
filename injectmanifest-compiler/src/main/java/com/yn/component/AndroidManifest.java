@@ -34,16 +34,19 @@ public abstract class AndroidManifest<T> {
 
 
     private static final int ACTION_NONE = 0x00;
-    private static final int ACTION_ACTIVITY = 0x01;
-    private static final int ACTION_SERVICE = 0x02;
-    private static final int ACTION_RECEIVER = 0x03;
-    private static final int ACTION_INTENTFILTER = 0x04;
-    private static final int ACTION_ACTION = 0x05;
-    private static final int ACTION_CATEGORY = 0x06;
+    private static final int ACTION_APPLICATION = 0x01;
+    private static final int ACTION_ACTIVITY = 0x02;
+    private static final int ACTION_SERVICE = 0x03;
+    private static final int ACTION_RECEIVER = 0x04;
+//    private static final int ACTION_INTENTFILTER = 0x05;
+//    private static final int ACTION_ACTION = 0x06;
+//    private static final int ACTION_CATEGORY = 0x07;
 
-    protected static String sPackageName;
-    protected final String mQualifiedName;
-    protected final Set<T> mCollections = new HashSet<>();
+    static int lastAction = ACTION_NONE;
+
+    static String sPackageName;
+    final String mQualifiedName;
+    final Set<T> mCollections = new HashSet<>();
 
     {
         mQualifiedName = setQName();
@@ -65,12 +68,10 @@ public abstract class AndroidManifest<T> {
     }
 
     public boolean copy(AndroidManifest<T> other) {
-        if (other.mCollections.isEmpty())
-            return false;
-        return this.mCollections.addAll(other.mCollections);
+        return !other.mCollections.isEmpty() && this.mCollections.addAll(other.mCollections);
     }
 
-    protected void writeIntentFilter2File(INode nodeWriter, NodeIntentFilter intentFilter) throws Exception {
+    void writeIntentFilter2File(INode nodeWriter, NodeIntentFilter intentFilter) throws Exception {
         if (!intentFilter.isEmpty()) {
             nodeWriter.startTag(QUALIFIED_NAME_INTENTFILTER, new HashSet<Attribute>());
             for (Attribute action : intentFilter.actions.all()) {
@@ -89,7 +90,7 @@ public abstract class AndroidManifest<T> {
         }
     }
 
-    protected void writeMetaData2File(INode nodeWriter, NodeMetaData metaDatas) throws Exception {
+    void writeMetaData2File(INode nodeWriter, NodeMetaData metaDatas) throws Exception {
         for (MetaData metaData : metaDatas.metaDatas) {
             nodeWriter.startTag(QUALIFIED_NAME_METADATA, metaData.asSet());
             nodeWriter.endTag(QUALIFIED_NAME_METADATA);
@@ -104,13 +105,13 @@ public abstract class AndroidManifest<T> {
     public abstract String setQName();
 
     public static class ManifestCollection extends AndroidManifest<NodeManifest> {
-        public static final String KEY_ATTR_XMLNS = "xmlns:android";
-        public static final String KEY_PACKAGE = "package";
-        public static final String KEY_SHARED_USER_ID = "android:sharedUserId";
-        public static final String KEY_SHARED_USER_LABEL = "android:sharedUserLabel";
-        public static final String KEY_VERSION_CODE = "android:versionCode";
-        public static final String KEY_VERSION_NAME = "android:versionName";
-        public static final String KEY_INSTALL_LOCATION = "android:installLocation";
+        static final String KEY_ATTR_XMLNS = "xmlns:android";
+        static final String KEY_PACKAGE = "package";
+        static final String KEY_SHARED_USER_ID = "android:sharedUserId";
+        static final String KEY_SHARED_USER_LABEL = "android:sharedUserLabel";
+        static final String KEY_VERSION_CODE = "android:versionCode";
+        static final String KEY_VERSION_NAME = "android:versionName";
+        static final String KEY_INSTALL_LOCATION = "android:installLocation";
 
         NodeManifest mManifest = new NodeManifest();
 
@@ -178,10 +179,17 @@ public abstract class AndroidManifest<T> {
 
         @Override
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
-            if (!qName.equals(mQualifiedName))
+            if (qName.equals(mQualifiedName)) {
+                lastAction = ACTION_APPLICATION;
+                if (attributes != null && !attributes.isEmpty()) {
+                    mApp.addAllAttr(attributes);
+                }
                 return;
-            if (attributes != null && !attributes.isEmpty()) {
-                mApp.addAllAttr(attributes);
+            }
+            if (lastAction != ACTION_APPLICATION)
+                return;
+            if (QUALIFIED_NAME_METADATA.equals(qName)) {
+                mApp.addMetaData(attributes);
             }
         }
 
@@ -224,9 +232,8 @@ public abstract class AndroidManifest<T> {
 
     private abstract static class ComponentBasicCollection<T extends ComponentBasic> extends AndroidManifest<T> {
 
-        protected static int lastAction = ACTION_NONE;
-        protected String lastComponentName;
-        protected boolean isLastElement = false;
+        String lastComponentName;
+        boolean isLastElement = false;
 
         @Override
         public void collect(T item) {
@@ -245,7 +252,7 @@ public abstract class AndroidManifest<T> {
             }
         }
 
-        protected <V extends Attribute> String getNameFromSet(String targetName, Set<V> set) {
+        <V extends Attribute> String getNameFromSet(String targetName, Set<V> set) {
             for (V item : set) {
                 if (item.key.equals(targetName))
                     return item.value;
@@ -263,31 +270,30 @@ public abstract class AndroidManifest<T> {
 
         @Override
         public void collect(String uri, String localName, String qName, Set<Attribute> attributes) {
+            Utils.note("origin activity attr: " + Arrays.toString(attributes.toArray(new Attribute[attributes.size()])));
             if (qName.equals(mQualifiedName)) {
                 lastAction = ACTION_ACTIVITY;
                 String activityName = getNameFromSet(KEY_ATTR_NAME, attributes);
                 activityName = Utils.getProperName(sPackageName, activityName);
-                if (attributes != null && !attributes.isEmpty()) {
+                if (!attributes.isEmpty()) {
                     collect((NodeActivity) new NodeActivity(lastComponentName = activityName).addAttr(attributes));
                 }
                 return;
             }
-            if (!(lastAction == ACTION_ACTIVITY))
+            if (lastAction != ACTION_ACTIVITY)
                 return;
-            if (QUALIFIED_NAME_ACTION.equals(qName)) {
-                if (attributes != null && !attributes.isEmpty()) {
+            if (!attributes.isEmpty()) {
+                if (QUALIFIED_NAME_ACTION.equals(qName)) {
                     collect((NodeActivity) new NodeActivity(lastComponentName).addAction(attributes));
-                }
-            } else if (QUALIFIED_NAME_CATEGORY.equals(qName)) {
-                if (attributes != null && !attributes.isEmpty()) {
+                } else if (QUALIFIED_NAME_CATEGORY.equals(qName)) {
                     collect((NodeActivity) new NodeActivity(lastComponentName).addCategory(attributes));
-                }
-            } else if (QUALIFIED_NAME_DATA.equals(qName)) {
-                if (attributes != null && !attributes.isEmpty()) {
-                    Utils.note("actiivity:data:attrs=" + Arrays.toString(attributes.toArray(new Attribute[attributes.size()])));
+                } else if (QUALIFIED_NAME_DATA.equals(qName)) {
                     collect((NodeActivity) new NodeActivity(lastComponentName).addData(attributes));
+                } else if (QUALIFIED_NAME_METADATA.equals(qName)) {
+                    collect((NodeActivity) new NodeActivity(lastComponentName).addMetaData(attributes));
                 }
             }
+
         }
 
         @Override
@@ -380,18 +386,15 @@ public abstract class AndroidManifest<T> {
             }
             if (!(lastAction == ACTION_SERVICE))
                 return;
-
-            else if (QUALIFIED_NAME_ACTION.equals(qName)) {
-                if (attributes != null && !attributes.isEmpty()) {
+            if (attributes != null && !attributes.isEmpty()) {
+                if (QUALIFIED_NAME_ACTION.equals(qName)) {
                     collect((NodeService) new NodeService(lastComponentName).addAction(attributes));
-                }
-            } else if (QUALIFIED_NAME_CATEGORY.equals(qName)) {
-                if (attributes != null && !attributes.isEmpty()) {
+                } else if (QUALIFIED_NAME_CATEGORY.equals(qName)) {
                     collect((NodeService) new NodeService(lastComponentName).addCategory(attributes));
-                }
-            } else if (qName.equals(QUALIFIED_NAME_DATA)) {
-                if (attributes != null && !attributes.isEmpty()) {
+                } else if (qName.equals(QUALIFIED_NAME_DATA)) {
                     collect((NodeService) new NodeService(lastComponentName).addData(attributes));
+                } else if (QUALIFIED_NAME_METADATA.equals(qName)) {
+                    collect((NodeService) new NodeService(lastComponentName).addMetaData(attributes));
                 }
             }
         }
@@ -450,17 +453,15 @@ public abstract class AndroidManifest<T> {
             }
             if (!(lastAction == ACTION_RECEIVER))
                 return;
-            else if (QUALIFIED_NAME_ACTION.equals(qName)) {
-                if (attributes != null && !attributes.isEmpty()) {
+            if (attributes != null && !attributes.isEmpty()) {
+                if (QUALIFIED_NAME_ACTION.equals(qName)) {
                     collect((NodeReceiver) new NodeReceiver(lastComponentName).addAction(attributes));
-                }
-            } else if (QUALIFIED_NAME_CATEGORY.equals(qName)) {
-                if (attributes != null && !attributes.isEmpty()) {
+                } else if (QUALIFIED_NAME_CATEGORY.equals(qName)) {
                     collect((NodeReceiver) new NodeReceiver(lastComponentName).addCategory(attributes));
-                }
-            } else if (QUALIFIED_NAME_DATA.equals(qName)) {
-                if (attributes != null && !attributes.isEmpty()) {
+                } else if (QUALIFIED_NAME_DATA.equals(qName)) {
                     collect((NodeReceiver) new NodeActivity(lastComponentName).addData(attributes));
+                } else if (QUALIFIED_NAME_METADATA.equals(qName)) {
+                    collect((NodeReceiver) new NodeReceiver(lastComponentName).addMetaData(attributes));
                 }
             }
         }

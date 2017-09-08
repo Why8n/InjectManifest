@@ -257,6 +257,10 @@ public class NodeApp {
         metaDatas.addMetaData(metaData);
         return this;
     }
+    public NodeApp addMetaData(Set<Attribute> metaDataAttrs) {
+        metaDatas.addMetaData(metaDataAttrs);
+        return this;
+    }
 
 }
 

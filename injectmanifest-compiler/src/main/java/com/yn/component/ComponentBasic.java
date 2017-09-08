@@ -7,7 +7,6 @@ package com.yn.component;
 import com.yn.component.bean.Attribute;
 import com.yn.component.bean.DataAttribute;
 import com.yn.component.bean.MetaData;
-import com.yn.utils.Utils;
 
 import java.util.Set;
 
@@ -84,7 +83,13 @@ public class ComponentBasic extends NodeBasic {
         this.metaDatas.addAll(other.metaDatas);
     }
 
-    public void addMetaData(MetaData metaData) {
-        metaDatas.addMetaData(metaData);
+    public ComponentBasic addMetaData(MetaData metaData) {
+        this.metaDatas.addMetaData(metaData);
+        return this;
+    }
+
+    public ComponentBasic addMetaData(Set<Attribute> metaDatas) {
+        this.metaDatas.addMetaData(metaDatas);
+        return this;
     }
 }
