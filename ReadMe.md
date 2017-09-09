@@ -26,6 +26,7 @@ public class App extends Application {
 rebuild and then you can get:
 
 ![@InjectManifest](http://upload-images.jianshu.io/upload_images/2222997-a0b13c8078301a2e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 other configurations for `manifest` tag are all supported by `@InjectManifes`
 
 * `application` tag 
