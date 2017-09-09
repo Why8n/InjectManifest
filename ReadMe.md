@@ -24,6 +24,7 @@ public class App extends Application {
 }
 ```
 rebuild and then you can get:
+
 ![@InjectManifest](http://upload-images.jianshu.io/upload_images/2222997-a0b13c8078301a2e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 other configurations for `manifest` tag are all supported by `@InjectManifes`
 
@@ -39,6 +40,7 @@ public class App extends Application {
 }
 ```
 rebuild and then you can get:
+
 ![@InjectApp](http://upload-images.jianshu.io/upload_images/2222997-6374cdd4041aab8b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 other configurations for `application` tag are all supported by `@InjectApp`
@@ -55,6 +57,7 @@ other configurations for `application` tag are all supported by `@InjectApp`
 public class MainActivity extends AppCompatActivity {}
 ```
 rebuild and then you can get:
+
 ![@InjectActivity](http://upload-images.jianshu.io/upload_images/2222997-3e94140c217b939f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 other configurations for `activity` tag are all supported by `@InjectActivity`
@@ -83,6 +86,7 @@ other configurations for `activity` tag are all supported by `@InjectActivity`
 public class FirstService extends Service {···}
 ```
 rebuild and then you can get:
+
 ![@InjectService](http://upload-images.jianshu.io/upload_images/2222997-86f2e79b8d7c04e5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 other configurations for `service` tag are all supported by `@InjectService`
@@ -98,6 +102,7 @@ other configurations for `service` tag are all supported by `@InjectService`
 public class FirstReceiver extends BroadcastReceiver {···}
 ```
 rebuild and then you can get:
+
 ![@InjectReceiver](http://upload-images.jianshu.io/upload_images/2222997-b61420b48ef9e3b9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 other configurations for `receiver` tag are all supported by `@InjectReceiver`
@@ -112,6 +117,7 @@ other configurations for `receiver` tag are all supported by `@InjectReceiver`
 public class FirstProvider extends android.content.ContentProvider {···}
 ```
 rebuild and then you can get:
+
 ![@InjectProvider](http://upload-images.jianshu.io/upload_images/2222997-de7c2958c0c85541.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 other configurations for `provider` tag are all supported by `@InjectProvider`
@@ -130,6 +136,7 @@ other configurations for `provider` tag are all supported by `@InjectProvider`
     }
 ```
 rebuild and then you can get:
+
 ![@InjectUsesPermission](http://upload-images.jianshu.io/upload_images/2222997-a9af8b6712eeafb7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 other configurations for `uses-permission` tag are all supported by `@InjectUsesPermission`
