@@ -8,12 +8,22 @@ class InjectManifest implements Plugin<Project> {
     private static final String SAVED_ANDROID_MANIFEST = "AndroidManifest_old.xml"
 
     void apply(Project project) {
+//        project.android.defaultConfig.javaCompileOptions.annotationProcessorOptions
+//                .arguments = ['AndroidManifestPath':project.android.sourceSets.main.manifest.srcFile.absolutePath]
         dependencies(project);
         project.extensions.create('manifestConfig', ManifestConfigExt, project)
 
         project.afterEvaluate {
-            def variants = determineVariants(project)
 
+            project.android.sourceSets.all(){
+                println "-------------$it.name"
+            }
+
+
+
+
+
+            def variants = determineVariants(project)
             project.android[variants].all { variant ->
                 configureVariant(project, variant)
             }
@@ -75,7 +85,8 @@ class InjectManifest implements Plugin<Project> {
 
     private static void dependencies(Project project) {
         project.dependencies {
-//            compile 'com.whyn:threaddispatcher:1.1.1'
+            compile 'com.whyn:injectmanifest-annotations:1.0.0'
+            annotationProcessor 'com.whyn:injectmanifest-compiler:1.0.0'
         }
     }
 
