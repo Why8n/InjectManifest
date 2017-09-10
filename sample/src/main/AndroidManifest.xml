@@ -1,79 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yn.injectmanifest"
-    android:installLocation="internalOnly"
-    android:sharedUserId="android.uid.system">
+    package="com.yn.injectmanifest">
 
-    <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission
-        android:name="com.permission.test01"
-        android:maxSdkVersion="13" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="15" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name="com.yn.injectmanifest.App.App"
-        android:debuggable="true"
-        android:label="i am app">
-        <meta-data android:name="app/meta-data" />
-
-        <activity android:name="com.yn.injectmanifest.MainActivity">
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action_whyn_test" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.whyn" />
-
-                <data android:mimeType="image/*" />
-            </intent-filter>
-            <meta-data
-                android:name="haha"
-                android:resource="123456" />
-        </activity>
-        <activity
-            android:name="com.yn.injectmanifest.SecondActivity"
-            android:label="I'm Second Activity">
-            <intent-filter>
-                <category android:name="com.yn.category" />
-            </intent-filter>
-        </activity>
-
-        <service
-            android:name="com.yn.injectmanifest.service.FirstService"
-            android:enabled="true"
-            android:label="Inject Service test">
-            <intent-filter>
-                <action android:name="com.yn.action.FirstService" />
-                <category android:name="com.yn.category.serviceTest" />
                 <data
-                    android:host="sdcard"
                     android:mimeType="video/mp4"
-                    android:path="/sdcard/1.MP4"
-                    android:pathPattern=".*\.mp4"
-                    android:pathPrefix="/sdcard/"
-                    android:port="-2"
-                    android:scheme="file" />
+                    android:scheme="https" />
             </intent-filter>
-            <meta-data
-                android:name="com.yn.meta-data.service"
-                android:resource="@mipmap/ic_launcher_round" />
-        </service>
-
-        <provider
-            android:name="com.yn.injectmanifest.providers.FirstProvider"
-            android:authorities="com.yn.authorities"
-            android:label="I am ContentProvider" />
-        <receiver
-            android:name="com.yn.injectmanifest.receivers.FirstReceiver"
-            android:enabled="true"
-            android:label="hi i am first receiver"
-            android:process=".remote" />
+            <meta-data android:name="haha" />
+        </activity>
     </application>
+
 </manifest>

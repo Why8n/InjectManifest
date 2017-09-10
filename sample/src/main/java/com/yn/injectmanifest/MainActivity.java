@@ -14,7 +14,7 @@ import com.yn.annotations.InjectUsesPermission;
 
 @InjectUsesPermission({
         Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
 })
 @InjectActivity(
         name = ".MainActivity",
@@ -23,7 +23,7 @@ import com.yn.annotations.InjectUsesPermission;
                 category = {"android.intent.category.LAUNCHER", "android.intent.category.whyn"},
                 data = @InjectData(mimeType = "image/*")
         ),
-        metaData = @InjectMetaData(name = "haha",resource = "123456")
+        metaData = @InjectMetaData(name = "haha")
 )
 public class MainActivity extends AppCompatActivity {
     @InjectUsesPermission(Manifest.permission.SEND_SMS)
