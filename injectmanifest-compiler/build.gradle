@@ -1,10 +1,20 @@
 apply plugin: 'java'
 
+def logger = new com.android.build.gradle.internal.LoggerWrapper(project.logger)
+def sdkHandler = new com.android.build.gradle.internal.SdkHandler(project, logger)
+for (File file : sdkHandler.sdkLoader.repositories) {
+    repositories.maven {
+        url = file.toURI()
+    }
+}
+
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.google.auto.service:auto-service:1.0-rc3'
     compile project(':injectmanifest-annotations')
-//    compile 'com.whyn:injectmanifest-annotations:1.0.0'
+    //    compile 'com.whyn:injectmanifest-annotations:1.0.0'
+    compile 'com.android.support:support-annotations:26.0.0-alpha1'
 }
 
 sourceCompatibility = "1.7"
