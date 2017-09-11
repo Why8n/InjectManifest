@@ -13,8 +13,8 @@ apply plugin: 'com.whyn.plugin.injectmanifest'
 //}
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
 //    sourceSets {
 //        main {
 //            manifest.srcFile "$project.projectDir/src/main/AndroidManifestOld.xml"
@@ -22,10 +22,10 @@ android {
 //    }
     defaultConfig {
         applicationId "com.yn.injectmanifest"
-        minSdkVersion 18
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode versions.versionCode
+        versionName versions.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
 //        javaCompileOptions {
@@ -51,9 +51,9 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.android.support.constraint:constraint-layout:1.0.1'
-    testCompile 'junit:junit:4.12'
+    compile deps.support.compat
+    compile deps.layout.constraint
+    testCompile deps.junit
 //
 //    provided project(':injectmanifest-annotations')
 //    annotationProcessor project(':injectmanifest-compiler')

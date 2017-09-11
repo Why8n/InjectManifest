@@ -11,10 +11,11 @@ for (File file : sdkHandler.sdkLoader.repositories) {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.google.auto.service:auto-service:1.0-rc3'
+    compile deps.auto.service
     compile project(':injectmanifest-annotations')
     //    compile 'com.whyn:injectmanifest-annotations:1.0.0'
-    compile 'com.android.support:support-annotations:26.0.0-alpha1'
+//    compile 'com.android.support:support-annotations:26.0.0-alpha1'
+    compile deps.support.annotations
 }
 
 sourceCompatibility = "1.7"
@@ -23,11 +24,11 @@ targetCompatibility = "1.7"
 apply plugin: 'com.novoda.bintray-release'
 
 publish {
-    userOrg = rootProject.ext.userOrg
-    groupId = rootProject.ext.groupId         //compile引用时的第1部分groupId
+    userOrg = uploadInfo.userOrg
+    groupId = uploadInfo.groupId         //compile引用时的第1部分groupId
     artifactId = 'injectmanifest-compiler'     //compile引用时的第2部分项目名
-    publishVersion = rootProject.ext.injectmanifest_compiler_version    //compile引用时的第3部分版本号
+    publishVersion = versions.injectmanifest_compiler_version    //compile引用时的第3部分版本号
     desc = 'annotation processor for library:InjectManifest'
-    website = rootProject.ext.website
+    website = uploadInfo.website
     uploadName = 'com.yn:injectmanifest-compiler'
 }

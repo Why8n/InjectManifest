@@ -38,11 +38,11 @@ publishing {
 apply plugin: 'com.novoda.bintray-release'
 
 publish {
-    userOrg = rootProject.ext.userOrg
-    groupId = rootProject.ext.groupId         //compile引用时的第1部分groupId
+    userOrg = uploadInfo.userOrg
+    groupId = uploadInfo.groupId         //compile引用时的第1部分groupId
     artifactId = 'injectmanifest-plugin'     //compile引用时的第2部分项目名
-    publishVersion = rootProject.ext.injectmanifest_plugin_version    //compile引用时的第3部分版本号
+    publishVersion = versions.injectmanifest_plugin_version    //compile引用时的第3部分版本号
     desc = 'gradle plugin for library:InjectManifest'
-    website = rootProject.ext.website
+    website = uploadInfo.website
     uploadName = 'com.yn:injectmanifest-plugin'
 }
