@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.whyn.plugin.injectmanifest'
+//apply plugin: 'com.whyn.plugin.injectmanifest'
 
 //manifestConfig {
 //    //the defautl AndroidManifest.xml path
@@ -55,6 +55,6 @@ dependencies {
     compile deps.layout.constraint
     testCompile deps.junit
 //
-//    provided project(':injectmanifest-annotations')
-//    annotationProcessor project(':injectmanifest-compiler')
+    provided project(':injectmanifest-annotations')
+    annotationProcessor project(':injectmanifest-compiler')
 }

@@ -46,3 +46,4 @@ publish {
     website = uploadInfo.website
     uploadName = 'com.yn:injectmanifest-plugin'
 }
+

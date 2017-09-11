@@ -12,9 +12,8 @@ for (File file : sdkHandler.sdkLoader.repositories) {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile deps.auto.service
-    compile project(':injectmanifest-annotations')
+    compileOnly project(':injectmanifest-annotations')
     //    compile 'com.whyn:injectmanifest-annotations:1.0.0'
-//    compile 'com.android.support:support-annotations:26.0.0-alpha1'
     compile deps.support.annotations
 }
 

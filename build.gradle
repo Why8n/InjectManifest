@@ -12,33 +12,33 @@ buildscript {
             'injectmanifest_compiler_version'   : '1.0.0',
             'injectmanifest_plugin_version'     : '1.2.0',
 
-            'bintrayRelease':'0.5.0',
+            'bintrayRelease'                    : '0.5.0',
 
-            'minSdk': 18,
-            'compileSdk': 26,
-            'versionCode':1,
-            'versionName':'1.0',
-            'buildTools': '26.0.1',
+            'minSdk'                            : 18,
+            'compileSdk'                        : 26,
+            'versionCode'                       : 1,
+            'versionName'                       : '1.0',
+            'buildTools'                        : '26.0.1',
 
-            'supportLibrary': '26.0.0-alpha1',
-            'androidPlugin': '2.2.2',
+            'supportLibrary'                    : '26.0.0-alpha1',
+            'androidPlugin'                     : '2.2.2',
 
-            'constraint':'1.0.1'
+            'constraint'                        : '1.0.1'
     ]
     ext.deps = [
-            android: [
+            android  : [
                     'gradlePlugin': "com.android.tools.build:gradle:${versions.androidPlugin}",
             ],
             'support': [
-                    'compat': "com.android.support:appcompat-v7:${versions.supportLibrary}",
+                    'compat'     : "com.android.support:appcompat-v7:${versions.supportLibrary}",
                     'annotations': "com.android.support:support-annotations:${versions.supportLibrary}",
             ],
-            junit: 'junit:junit:4.12',
-            'auto': [
+            junit    : 'junit:junit:4.12',
+            'auto'   : [
                     'service': 'com.google.auto.service:auto-service:1.0-rc3',
             ],
-            layout: [
-                    'constraint':"com.android.support.constraint:constraint-layout:${versions.constraint}"
+            layout   : [
+                    'constraint': "com.android.support.constraint:constraint-layout:${versions.constraint}"
             ],
     ]
 
@@ -71,3 +71,49 @@ task clean(type: Delete) {
 }
 
 
+def runCmd(List<String> cmd) {
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('window‌​s')) {
+        println 'window system'
+        commandLine 'cmd', '/c', cmd
+    } else {
+        println 'linux system'
+        commandLine "./$cmd"
+    }
+}
+
+subprojects { project ->
+    if (project.name != 'sample') {
+
+        project.task('upload2jcenter', type: Exec) {
+            group = "whyn"
+            description = "upload module to jcenter by bintray-release"
+
+            def cmdProc;
+            if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+                println 'window system'
+                cmdProc = ['cmd', '/c']
+            } else {
+                println 'linux system'
+                cmdProc = ['./sh']
+            }
+
+            File bintrayFile = rootProject.file('bintray.properties')
+            if (bintrayFile.exists()) {
+                Properties properties = new Properties()
+                properties.load(new FileInputStream(bintrayFile))
+                workingDir rootProject.projectDir.absolutePath
+                cmdProc+=['gradlew.bat',
+                          'clean',
+                          'build',
+                          "${project.name}:bintrayUpload",
+                          "-PbintrayUser=$properties['userName']",
+                          "-PbintrayKey=$properties['bintrayKey']",
+                          '-PdryRun=false']
+                commandLine cmdProc
+            } else {
+                cmdProc+="echo failed to upload:${project.name},no bintray.properties found"
+                commandLine cmdProc
+            }
+        }
+    }
+}

@@ -9,3 +9,4 @@
 .externalNativeBuild
 AndroidManifest_old.xml
 *~
+bintray.properties
