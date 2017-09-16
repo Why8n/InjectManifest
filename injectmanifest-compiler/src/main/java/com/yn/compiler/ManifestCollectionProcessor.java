@@ -81,9 +81,13 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotations = new HashSet<>();
-        annotations.add(InjectUsesPermission.class.getCanonicalName());
+        annotations.add(InjectManifest.class.getCanonicalName());
+        annotations.add(InjectApp.class.getCanonicalName());
         annotations.add(InjectActivity.class.getCanonicalName());
         annotations.add(InjectService.class.getCanonicalName());
+        annotations.add(InjectReceiver.class.getCanonicalName());
+        annotations.add(InjectProvider.class.getCanonicalName());
+        annotations.add(InjectUsesPermission.class.getCanonicalName());
         return annotations;
     }
 
@@ -444,10 +448,12 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 (AndroidManifest.ApplicationCollection) manifest.getTag(TAG_APPLICATION);
         checkCollection(appCollection, AndroidManifest.ApplicationCollection.class, TAG_APPLICATION);
         for (Element element : annotationElements) {
+            Utils.note("parseApp ------------------------");
             if (!isClass(element, InjectApp.class) || !isSubtypeOfType(element, TYPE_APP))
                 return false;
             InjectApp app = element.getAnnotation(InjectApp.class);
             parseApp(appCollection, app, element);
+            isNeedGenerateXml = true;
         }
         return true;
     }
