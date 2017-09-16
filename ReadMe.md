@@ -145,6 +145,7 @@ other configurations for `uses-permission` tag are all supported by `@InjectUses
 Download
 --------
 Via Gradle:
+
 first add the plugin to your `buildscript`:
 ```groovy
 buildscript {
@@ -152,10 +153,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.whyn:injectmanifest-plugin:1.1.0'
+        classpath 'com.whyn:injectmanifest-plugin:<latest-version>'
     }
 }
 ```
+**ps:**you can check the newest version:[injectmanifest-plugin](https://bintray.com/search?query=injectmanifest-plugin)
+
 and then apply it in your module:
 ```groovy
 apply plugin: 'com.android.application'

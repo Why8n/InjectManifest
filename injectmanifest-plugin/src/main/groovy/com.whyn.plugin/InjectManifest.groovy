@@ -77,8 +77,8 @@ class InjectManifest implements Plugin<Project> {
 
     private static void dependencies(Project project) {
         project.dependencies {
-            annotationProcessor 'com.whyn:injectmanifest-compiler:1.0.0'
-            provided 'com.whyn:injectmanifest-annotations:1.0.0'
+            annotationProcessor 'com.whyn:injectmanifest-compiler:1.1.0'
+            compileOnly 'com.whyn:injectmanifest-annotations:1.0.0'
         }
     }
 

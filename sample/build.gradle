@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.whyn.plugin.injectmanifest'
 
+apply plugin: "com.dorongold.task-tree"
 //manifestConfig {
 //    //the defautl AndroidManifest.xml path
 //    originManifestPath android.sourceSets.main.manifest.srcFile.absolutePath

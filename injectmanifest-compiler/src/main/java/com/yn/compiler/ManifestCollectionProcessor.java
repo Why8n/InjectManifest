@@ -448,7 +448,6 @@ public class ManifestCollectionProcessor extends AbstractProcessor {
                 (AndroidManifest.ApplicationCollection) manifest.getTag(TAG_APPLICATION);
         checkCollection(appCollection, AndroidManifest.ApplicationCollection.class, TAG_APPLICATION);
         for (Element element : annotationElements) {
-            Utils.note("parseApp ------------------------");
             if (!isClass(element, InjectApp.class) || !isSubtypeOfType(element, TYPE_APP))
                 return false;
             InjectApp app = element.getAnnotation(InjectApp.class);

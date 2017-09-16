@@ -12,7 +12,7 @@ for (File file : sdkHandler.sdkLoader.repositories) {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile deps.auto.service
-    compileOnly project(':injectmanifest-annotations')
+    compile project(':injectmanifest-annotations')
     //    compile 'com.whyn:injectmanifest-annotations:1.0.0'
     compile deps.support.annotations
 }

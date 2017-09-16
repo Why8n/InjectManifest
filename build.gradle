@@ -9,8 +9,8 @@ buildscript {
     ]
     ext.versions = [
             'injectmanifest_annotations_version': '1.0.0',
-            'injectmanifest_compiler_version'   : '1.0.0',
-            'injectmanifest_plugin_version'     : '1.2.0',
+            'injectmanifest_compiler_version'   : '1.1.0',
+            'injectmanifest_plugin_version'     : '1.3.0',
 
             'bintrayRelease'                    : '0.5.0',
 
@@ -44,16 +44,21 @@ buildscript {
 
     repositories {
         jcenter()
-//        maven {//本地Maven仓库地址
-//            url uri('D:/Android/repos')
-//        }
+        maven {//本地Maven仓库地址
+            url uri('D:/Android/repos')
+        }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${versions.androidPlugin}"
-//        classpath 'com.whyn.plugin:injectmanifest:1.0.0'
+        classpath 'com.whyn.plugin:injectmanifest:1.0.0'
 
         classpath "com.novoda:bintray-release:${versions.bintrayRelease}"
-        classpath "com.whyn:injectmanifest-plugin:${versions.injectmanifest_plugin_version}"
+//        classpath "com.whyn:injectmanifest-plugin:${versions.injectmanifest_plugin_version}"
+
+        classpath "gradle.plugin.com.dorongold.plugins:task-tree:1.3"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -71,16 +76,6 @@ task clean(type: Delete) {
 }
 
 
-def runCmd(List<String> cmd) {
-    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('window‌​s')) {
-        println 'window system'
-        commandLine 'cmd', '/c', cmd
-    } else {
-        println 'linux system'
-        commandLine "./$cmd"
-    }
-}
-
 subprojects { project ->
     if (project.name != 'sample') {
 
@@ -90,10 +85,8 @@ subprojects { project ->
 
             def cmdProc;
             if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-                println 'window system'
                 cmdProc = ['cmd', '/c']
             } else {
-                println 'linux system'
                 cmdProc = ['./sh']
             }
 
@@ -102,16 +95,18 @@ subprojects { project ->
                 Properties properties = new Properties()
                 properties.load(new FileInputStream(bintrayFile))
                 workingDir rootProject.projectDir.absolutePath
-                cmdProc+=['gradlew.bat',
-                          'clean',
-                          'build',
-                          "${project.name}:bintrayUpload",
-                          "-PbintrayUser=$properties['userName']",
-                          "-PbintrayKey=$properties['bintrayKey']",
-                          '-PdryRun=false']
+                def userName =properties['userName']
+                def bintrayKey =properties['bintrayKey']
+                cmdProc += ['gradlew.bat',
+                            'clean',
+                            'build',
+                            "${project.name}:bintrayUpload",
+                            "-PbintrayUser=$userName",
+                            "-PbintrayKey=$bintrayKey",
+                            '-PdryRun=false']
                 commandLine cmdProc
             } else {
-                cmdProc+="echo failed to upload:${project.name},no bintray.properties found"
+                cmdProc += "echo failed to upload:${project.name},no bintray.properties found"
                 commandLine cmdProc
             }
         }

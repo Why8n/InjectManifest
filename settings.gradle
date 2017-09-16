@@ -1,1 +1,6 @@
-include ':sample', ':injectmanifest-compiler', ':injectmanifest-annotations', ':injectmanifest-plugin'
+include ':sample'
+include ':injectmanifest-compiler'
+include ':injectmanifest-annotations'
+include ':injectmanifest-plugin'
+
+rootProject.name='injectmanifest-root'
